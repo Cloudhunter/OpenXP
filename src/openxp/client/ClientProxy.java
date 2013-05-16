@@ -1,21 +1,20 @@
 package openxp.client;
 
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import openxp.OpenXP;
 import openxp.client.gui.GuiPeripheralEnchantment;
-import openxp.client.gui.GuiXPIngester;
+import openxp.client.gui.GuiXPBottler;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityPeripheralEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPIngester;
+import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 
 public class ClientProxy extends CommonProxy {
 
@@ -36,13 +35,11 @@ public class ClientProxy extends CommonProxy {
 			int x, int y, int z) {
 		if ((world instanceof WorldClient)) {
 			TileEntity tile = world.getBlockTileEntity(x, y, z);
-		      switch (ID) {
-		      case 1:
-		    	  return new GuiXPIngester(new ContainerGeneric(player.inventory, tile, TileEntityXPIngester.SLOTS), (TileEntityXPIngester)tile);
-		      case 2:
-		    	  return new GuiPeripheralEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS), (TileEntityPeripheralEnchantmentTable)tile);
-		      
-		      }
+			if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
+				  return new GuiPeripheralEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS), (TileEntityPeripheralEnchantmentTable)tile);
+			}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
+				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
+			}
 		}
 		return null;
 	}

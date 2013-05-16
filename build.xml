@@ -136,6 +136,10 @@
 	</target>
 
 	<!-- Default target to run -->
-	<target name="main" depends="package"/>
+	<target name="main" depends="package">
+		<copy todir="../instances/1.5.2_fresh/minecraft/mods">
+			<fileset dir="${jar.dir}"/>
+		</copy>
+	</target>
 
 </project>

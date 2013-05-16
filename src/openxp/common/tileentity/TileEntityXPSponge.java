@@ -2,6 +2,12 @@ package openxp.common.tileentity;
 
 import java.util.List;
 
+import openxp.client.core.BaseTankContainer;
+import openxp.client.core.BaseTileEntity;
+import openxp.client.core.ITankCallback;
+import openxp.client.core.SavableInt;
+import openxp.common.util.EnchantmentUtils;
+
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
@@ -18,14 +24,18 @@ import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 
-public class TileEntityXPSponge extends TileEntity implements ITankContainer {
+public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 
-	public final LiquidTank tank = new LiquidTank(LiquidContainerRegistry.BUCKET_VOLUME * 5);
-
-	private int lastFilled = 0;
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
 	
-	AxisAlignedBB suckupBounds;
-	AxisAlignedBB destroyBounds;
+	private SavableInt lastFilled = new SavableInt("lastFilled");
+	
+	private AxisAlignedBB suckupBounds;
+	private AxisAlignedBB destroyBounds;
+	
+	public TileEntityXPSponge() {
+		
+	}
 	
 	private void createBounds() {
 		if (suckupBounds == null) {
@@ -73,10 +83,7 @@ public class TileEntityXPSponge extends TileEntity implements ITankContainer {
 			
 			if (!worldObj.isRemote) {
 				if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
-					if (getAmountFilled() == 0) {
-						worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
-					}
-					tank.fill(LiquidDictionary.getLiquid("liquidxp", entity.getXpValue()), true);
+					tanks.fill(LiquidDictionary.getLiquid("liquidxp", entity.getXpValue()), true);
 					entity.setDead();
 				}
 			}
@@ -84,93 +91,65 @@ public class TileEntityXPSponge extends TileEntity implements ITankContainer {
 		}
 
 		if (!worldObj.isRemote) { 
-
-			int filled = getAmountFilled()/100;
-			if (filled != lastFilled) {
+			int filled = (int)Math.round(tanks.getPercentFull());
+			if (filled != lastFilled.getValue()) {
+				lastFilled.setValue(filled);
 				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
-			lastFilled = filled;
-			
 		}
 
 	}
 	
+	public LiquidStack getLiquidStack() {
+		return tanks.getLiquid();
+	}
+	
+	public int getLastFilled() {
+		return lastFilled.getValue();
+	}
+	
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		tanks.readFromNBT(tag);
+		lastFilled.readFromNBT(tag);
+	}
+	
+	@Override
+	public void writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
+		tanks.writeToNBT(tag);
+		lastFilled.writeToNBT(tag);
+	}
+
 	@Override
 	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return tank.fill(resource, doFill);
+		return 0;
 	}
 
 	@Override
 	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return tank.fill(resource, doFill);
+		return 0;
 	}
 
 	@Override
 	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tank.drain(maxDrain, doDrain);
+		return tanks.drain(from, maxDrain, doDrain);
 	}
 
 	@Override
 	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tank.drain(maxDrain, doDrain);
+		return tanks.drain(tankIndex, maxDrain, doDrain);
 	}
 
 	@Override
 	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return new ILiquidTank[]{tank};
+		return tanks.getTanks(direction);
 	}
 
 	@Override
 	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tank;
-	}
-
-	@Override
-	public Packet getDescriptionPacket() {
-		Packet132TileEntityData packet = new Packet132TileEntityData();
-		packet.actionType = 0;
-		packet.xPosition = xCoord;
-		packet.yPosition = yCoord;
-		packet.zPosition = zCoord;
-		NBTTagCompound nbt = new NBTTagCompound();
-		writeToNBT(nbt);
-		packet.customParam1 = nbt;
-		return packet;
-	}
-
-	@Override
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) {
-		readFromNBT(pkt.customParam1);
+		return tanks.getTank(direction, type);
 	}
 	
-	
-	@Override
-	public void readFromNBT(NBTTagCompound data) {
-		super.readFromNBT(data);
-		LiquidStack liquid = LiquidStack.loadLiquidStackFromNBT(data.getCompoundTag("tank"));
-		if (liquid != null) {
-			tank.setLiquid(liquid);
-		}
-	}
-	
-	@Override
-	public void writeToNBT(NBTTagCompound data) {
-		super.writeToNBT(data);
-		if (tank.containsValidLiquid()) {
-			data.setTag("tank", tank.getLiquid().writeToNBT(new NBTTagCompound()));
-		}
-	}
-	
-	public LiquidStack getLiquidStack() {
-		return tank.getLiquid();
-	}
-	
-	public int getAmountFilled() {
-		LiquidStack liquid = tank.getLiquid();
-		return liquid == null ? 0 : liquid.amount;
-	}
-
-	public double getPercentFull() {
-		return 1.0/tank.getCapacity() * getAmountFilled();
-	}
 }

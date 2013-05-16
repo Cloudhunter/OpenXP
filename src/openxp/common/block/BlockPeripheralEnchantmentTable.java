@@ -28,7 +28,7 @@ public class BlockPeripheralEnchantmentTable extends BlockEnchantmentTable {
 		if (player.isSneaking() || tileEntity == null) {
 			return false;
 		}
-		player.openGui(OpenXP.instance, 2, world, x, y, z);
+		player.openGui(OpenXP.instance, OpenXP.Gui.enchantmentTable.ordinal(), world, x, y, z);
 		return true;
 	}
 	

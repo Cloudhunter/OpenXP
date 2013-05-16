@@ -14,9 +14,8 @@ public class ItemLiquidXP extends Item {
 	
 	public ItemLiquidXP() {
 		super(OpenXP.Config.liquidXpItemID);
-		setUnlocalizedName("immibis/lxp:liquid");
+		setUnlocalizedName("liquidxp");
 		LanguageRegistry.addName(this, "Liquid XP");
-		setCreativeTab(OpenXP.tabOpenXP);
 		LiquidDictionary.getOrCreateLiquid("liquidxp", new LiquidStack(this, 1));
 	}
 	
@@ -24,7 +23,10 @@ public class ItemLiquidXP extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister iconRegister) {
-		this.itemIcon = Block.blockLapis.getBlockTextureFromSide(0);
+		this.itemIcon = iconRegister.registerIcon("openxp:xpjuice");
+
+		OpenXP.liquidStack.setRenderingIcon(itemIcon);
+		OpenXP.liquidStack.setTextureSheet("/mods/openxp/textures/items/xpjuice.png");
 	}
 
 }

@@ -5,11 +5,12 @@ import java.lang.reflect.Modifier;
 
 import openxp.OpenXP;
 import openxp.common.block.BlockPeripheralEnchantmentTable;
+import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityPeripheralEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPIngester;
+import openxp.common.tileentity.TileEntityXPBottler;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -20,8 +21,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.liquids.LiquidContainerData;
+import net.minecraftforge.liquids.LiquidContainerRegistry;
+import net.minecraftforge.liquids.LiquidDictionary;
+import net.minecraftforge.liquids.LiquidStack;
 
 public class CommonProxy implements IGuiHandler
 {   
@@ -37,11 +43,16 @@ public class CommonProxy implements IGuiHandler
 	{
 		OpenXP.Blocks.XPSponge = new BlockXPSponge();
 		OpenXP.Blocks.enchantmentTable = new BlockPeripheralEnchantmentTable();
+		OpenXP.Blocks.XPBottler = new BlockXPBottler();
 	}
 	
 	private void initItems()
 	{
 		OpenXP.Items.liquidXP = new ItemLiquidXP();
+		
+		LiquidDictionary.getOrCreateLiquid("liquidxp", new LiquidStack(OpenXP.Items.liquidXP, 1));
+		
+		OpenXP.liquidStack = LiquidDictionary.getCanonicalLiquid("liquidxp");
 	}	
 	
 	public void registerRenderInformation() {
@@ -52,13 +63,13 @@ public class CommonProxy implements IGuiHandler
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world,
 			int x, int y, int z) {
 		TileEntity tile = world.getBlockTileEntity(x, y, z);
-		switch (ID) {
-	    case 1:
-	    	return new ContainerGeneric(player.inventory, tile, TileEntityXPIngester.SLOTS);
-	    case 2:
-	    	return new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS);
 		
+		if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
+			return new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS);
+		}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
+			return new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS);	
 		}
+		
 		return null;
 	}
 

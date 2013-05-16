@@ -6,8 +6,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
+import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
 import openxp.common.block.BlockPeripheralEnchantmentTable;
+import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -29,13 +31,21 @@ public class OpenXP
 	{
 		public static int spongeBlockID = 500;
 		public static int enchantmentTableID = 501;
+		public static int bottlerID = 502;
 		
 		public static int liquidXpItemID = 3000;
+	}
+	
+	public static enum Gui
+	{
+		enchantmentTable,
+		xpBottler
 	}
 	
 	public static class Blocks
 	{
 		public static BlockXPSponge XPSponge;
+		public static BlockXPBottler XPBottler;
 		public static BlockPeripheralEnchantmentTable enchantmentTable;
 	}
 	
@@ -43,6 +53,9 @@ public class OpenXP
 	{
 		public static ItemLiquidXP liquidXP;
 	}
+	
+
+	public static LiquidStack liquidStack;
 	
 	public static int renderId;
 

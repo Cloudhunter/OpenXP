@@ -1,7 +1,13 @@
 package openxp.common.container;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import openxp.api.IHasSimpleGui;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,11 +19,13 @@ public class ContainerGeneric extends Container {
 	private TileEntity tileentity;
 	protected IInventory playerInventory;
 
+	private int[] craftingProgress = new int[16];
+	
 	public ContainerGeneric(IInventory playerInventory, TileEntity tileentity, int[] slots) {
 		this.inventorySize = slots.length / 2;
 		this.playerInventory = playerInventory;
 		this.tileentity = tileentity;
-
+		
 		for (int i = 0, slotId = 0; i < slots.length; i += 2, slotId++) {
 			addSlotToContainer(new Slot((IInventory)tileentity, slotId, slots[i], slots[i+1]));
 		}
@@ -68,4 +76,61 @@ public class ContainerGeneric extends Container {
 		return inventorySize;
 	}
 
+	public boolean enchantItem(EntityPlayer player, int button) {
+		if (tileentity instanceof IHasSimpleGui) {
+			((IHasSimpleGui)tileentity).onServerButtonClicked(player, button);
+		}
+		return false;
+	}
+	
+	@Override
+    public void addCraftingToCrafters(ICrafting crafting)
+    {
+        super.addCraftingToCrafters(crafting);
+        if (tileentity instanceof IHasSimpleGui) {
+	        int[] craftingValues = ((IHasSimpleGui)tileentity).getGuiValues();
+	        for (int i = 0; i < craftingValues.length; i++) {
+		        craftingProgress[i] = craftingValues[i];
+	            crafting.sendProgressBarUpdate(this, i, craftingValues[i]);
+	        }
+        }
+    }
+	
+    public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
+
+        if (tileentity instanceof IHasSimpleGui) {
+        	
+	        int[] newValues = ((IHasSimpleGui)tileentity).getGuiValues();
+	        
+
+	        for (int i = 0; i < this.crafters.size(); ++i)
+	        {
+	            ICrafting icrafting = (ICrafting)this.crafters.get(i);
+	            
+	        	for (int j = 0; j < newValues.length; j++ ) {
+
+	        		if (craftingProgress[j] != newValues[j]) {
+
+	                    icrafting.sendProgressBarUpdate(this, j, newValues[j]);
+	        		
+	        		}
+	        	}
+	        }
+	        
+	        for (int i  = 0; i < newValues.length; i++) {
+	        	craftingProgress[i] = newValues[i];
+	        }
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void updateProgressBar(int par1, int par2)
+    {
+        if (tileentity instanceof IHasSimpleGui) {
+        	
+        	((IHasSimpleGui)tileentity).setGuiValue(par1, par2);
+        }
+    }
 }

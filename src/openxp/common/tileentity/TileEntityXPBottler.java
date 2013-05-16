@@ -1,22 +1,12 @@
 package openxp.common.tileentity;
 
-import java.util.List;
-
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraft.tileentity.TileEntityEnchantmentTable;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
@@ -25,95 +15,147 @@ import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
 import openxp.client.core.BaseInventory;
 import openxp.client.core.BaseTankContainer;
+import openxp.client.core.BaseTileEntity;
 import openxp.client.core.GuiValueHolder;
 import openxp.client.core.IInventoryCallback;
 import openxp.client.core.ITankCallback;
 import openxp.client.core.SavableInt;
 import openxp.common.util.EnchantmentUtils;
 
-public class TileEntityPeripheralEnchantmentTable extends
-TileEntityEnchantmentTable implements IInventory, IHasSimpleGui,
-ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
+public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
+ISidedInventory, ITankContainer, IHasSimpleGui, IInventoryCallback,
+ITankCallback {
 
-	public final static int[] SLOTS = new int[] { 10, 33, 150, 33 };
+	public static final int MODE_FILL = 0;
+	public static final int MODE_DRAIN = 1;
 
-	public final static int BUTTON_LOWEST = 0;
-	public final static int BUTTON_HIGHEST = 1;
+	public static final int INPUT_SLOT = 0;
+	public static final int OUTPUT_SLOT = 1;
 
-	public final static int MODE_LOWEST = 0;
-	public final static int MODE_HIGHEST = 1;
+	public static final int[] SLOTS = new int[] { 48, 34, 102, 34 };
 
-	public final static int INPUT_STACK = 0;
-	public final static int OUTPUT_STACK = 1;
-
-	protected SavableInt mode = new SavableInt("mode");
-	protected SavableInt levelsAvailable = new SavableInt("levelsAvailable");
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
-	protected BaseInventory inventory = new BaseInventory("enchantmenttable", true, 2);
+	protected SavableInt progress = new SavableInt("progress");
+	private int mode = MODE_FILL;
+	protected SavableInt percentStored = new SavableInt("percentStored");
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.XP_PER_BOTTLE * 32));
+	protected BaseInventory inventory = new BaseInventory("xpbottler", true, 2);
 	protected boolean hasChanged = false;
-	protected GuiValueHolder guiValues = new GuiValueHolder(mode, levelsAvailable);
+	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored,progress);
 
-	public TileEntityPeripheralEnchantmentTable() {
+	public TileEntityXPBottler() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
 
+	public int getSpeed() {
+		return 20;
+	}
 
 	@Override
 	public void updateEntity() {
+		if (!worldObj.isRemote) {
 
-		super.updateEntity();
+			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);
 
-		if (!worldObj.isRemote){
+			if (inventory.isItem(INPUT_SLOT, Item.expBottle)) {
+				drainBottles();
+			} else if (inventory.isItem(INPUT_SLOT, Item.glassBottle)) {
+				fillBottles();
+			}
 
 			if (hasChanged) {
-
-				levelsAvailable.setValue(EnchantmentUtils.getLevelForExperience(getExperience()));
-
-				ItemStack inputStack = inventory.getStackInSlot(INPUT_STACK);
-				ItemStack outputStack = inventory.getStackInSlot(OUTPUT_STACK);
-
-				if (inputStack != null &&
-						inputStack.isItemEnchantable() &&
-						outputStack == null) {
-
-					double power = EnchantmentUtils.getPower(worldObj, xCoord, yCoord, zCoord);
-
-					boolean getMaxEnchantability = mode.getValue() == MODE_HIGHEST;
-
-					int enchantability = EnchantmentUtils.calcEnchantability(inputStack, (int)power, getMaxEnchantability);
-
-					int xpRequired = EnchantmentUtils.getExperienceForLevel(enchantability);
-
-					if (xpRequired >= enchantability) {
-
-						tanks.drain(xpRequired, true);
-
-						inventory.setInventorySlotContents(OUTPUT_STACK, inputStack);
-						inventory.setInventorySlotContents(INPUT_STACK, null);
-						EnchantmentUtils.enchantItem(inputStack, enchantability, worldObj.rand);
-
-						levelsAvailable.setValue(EnchantmentUtils.getLevelForExperience(getExperience()));
-
-					}
-				}
+				percentStored.setValue((int) tanks.getPercentFull());
 			}
 
 			hasChanged = false;
 		}
+	}
+
+	public void drainBottles() {
+
+		if (tanks.getTankAmount() + EnchantmentUtils.XP_PER_BOTTLE > tanks.getCapacity() ||
+				!areSlotsValid(Item.expBottle, Item.glassBottle)) {
+
+			progress.setValue(0);
+			return;
+		}
+
+		progress.add(1);
+
+		if (progress.getValue() >= getSpeed()) {
+			switchSlots(Item.expBottle, Item.glassBottle);
+			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.XP_PER_BOTTLE), true);
+			progress.setValue(0);
+		}
 
 	}
 
-	public int getLevelsAvailable() {
-		return levelsAvailable.getValue();
+	public void fillBottles() {
+
+		if (tanks.getTankAmount() < EnchantmentUtils.XP_PER_BOTTLE ||
+			!areSlotsValid(Item.glassBottle, Item.expBottle)) {
+
+			progress.setValue(0);
+			return;
+		}
+
+		progress.add(1);
+
+		if (progress.getValue() >= getSpeed()) {
+			switchSlots(Item.glassBottle, Item.expBottle);
+			tanks.drain(EnchantmentUtils.XP_PER_BOTTLE, true);
+			progress.setValue(0);
+		}
+
 	}
 
-	public int getMode() {
-		return mode.getValue();
+	private boolean areSlotsValid(Item inputItem, Item outputItem) {
+
+		ItemStack inputStack = inventory.getStackInSlot(INPUT_SLOT);
+		ItemStack outputStack = inventory.getStackInSlot(OUTPUT_SLOT);
+
+		if (!inventory.isItem(INPUT_SLOT, inputItem)) {
+			return false;
+		}
+
+		return (
+				outputStack == null ||
+				(outputStack.getItem() == outputItem && outputStack.stackSize < outputStack.getMaxStackSize())
+		);
+
 	}
 
-	public int getExperience() {
-		return tanks.getTankAmount();
+	private boolean switchSlots(Item inputItem, Item outputItem) {
+
+		ItemStack outputStack = inventory.getStackInSlot(OUTPUT_SLOT);
+
+		if (outputStack == null) {
+			inventory.setInventorySlotContents(OUTPUT_SLOT, new ItemStack(outputItem));
+			inventory.decrStackSize(INPUT_SLOT, 1);
+			return true;
+		} else if (outputStack.getItem() == outputItem && outputStack.stackSize < outputStack.getMaxStackSize()) {
+			outputStack.stackSize++;
+			inventory.decrStackSize(INPUT_SLOT, 1);
+			return true;
+		}
+
+		return false;
+	}
+
+	public double getPercentProgress() {
+		return 100.0 / getSpeed() * getProgress();
+	}
+
+	public int getProgress() {
+		return progress.getValue();
+	}
+
+	public int getPercentStored() {
+		return percentStored.getValue();
+	}
+
+	public void setPercentStored(int value) {
+		percentStored.setValue(value);
 	}
 
 	@Override
@@ -121,8 +163,8 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 		super.readFromNBT(tag);
 		inventory.readFromNBT(tag);
 		tanks.readFromNBT(tag);
-		mode.readFromNBT(tag);
-		levelsAvailable.readFromNBT(tag);
+		percentStored.readFromNBT(tag);
+		progress.readFromNBT(tag);
 	}
 
 	@Override
@@ -130,31 +172,14 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 		super.writeToNBT(tag);
 		inventory.writeToNBT(tag);
 		tanks.writeToNBT(tag);
-		mode.writeToNBT(tag);
-		levelsAvailable.writeToNBT(tag);
-	}
-
-	@Override
-	public Packet getDescriptionPacket() {
-		Packet132TileEntityData packet = new Packet132TileEntityData();
-		packet.actionType = 0;
-		packet.xPosition = xCoord;
-		packet.yPosition = yCoord;
-		packet.zPosition = zCoord;
-		NBTTagCompound nbt = new NBTTagCompound();
-		writeToNBT(nbt);
-		packet.customParam1 = nbt;
-		return packet;
-	}
-
-	@Override
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) {
-		readFromNBT(pkt.customParam1);
+		percentStored.writeToNBT(tag);
+		progress.writeToNBT(tag);
 	}
 
 	@Override
 	public void onInventoryChanged(BaseInventory inventory) {
 		hasChanged = true;
+		progress.setValue(0);
 	}
 
 	@Override
@@ -164,19 +189,11 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	@Override
 	public void onServerButtonClicked(EntityPlayer player, int button) {
-		onClientButtonClicked(button);
+		hasChanged = true;
 	}
 
 	@Override
 	public void onClientButtonClicked(int button) {
-		switch(button) {
-		case BUTTON_LOWEST:
-			mode.setValue(MODE_LOWEST);
-			break;
-		case BUTTON_HIGHEST:
-			mode.setValue(MODE_HIGHEST);
-			break;
-		}
 	}
 
 	@Override
@@ -236,7 +253,7 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	@Override
 	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
-		return true;
+		return slotID == OUTPUT_SLOT;
 	}
 
 	@Override
