@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
@@ -36,37 +37,32 @@ import openxp.common.util.EnchantmentUtils;
 public class TileEntityAutoAnvil extends BaseTileEntity implements IInventory,
 ISidedInventory, ITankContainer, IHasSimpleGui, IInventoryCallback,
 ITankCallback  {
+
+	public final static int[] SLOTS = new int[] { 48, 24, 48, 47, 102, 34 };
 	
-    /** The maximum cost of repairing/renaming in the anvil. */
-    public int maximumCost = 0;
-
-    /** determined by damage of input item and stackSize of repair materials */
-    private int stackSizeToBeUsedInRepair = 0;
-    private String repairedItemName;
-    
-	public final static int[] SLOTS = new int[] { 10, 33, 10, 54, 150, 33 };
-	
-	public final static int BUTTON_LOWEST = 0;
-	public final static int BUTTON_HIGHEST = 1;
-
-	public final static int MODE_LOWEST = 0;
-	public final static int MODE_HIGHEST = 1;
-
 	public final static int INPUT_STACK = 0;
 	public final static int MODIFIER_STACK = 1;
 	public final static int OUTPUT_STACK = 2;
 
-	protected SavableInt mode = new SavableInt("mode");
-	protected SavableInt levelsAvailable = new SavableInt("levelsAvailable");
 	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
 	protected BaseInventory inventory = new BaseInventory("autoAnvil", true, 3);
 	protected boolean hasChanged = false;
-	protected GuiValueHolder guiValues = new GuiValueHolder(mode, levelsAvailable);
+
+	/**
+	 * The progress bar in the GUI
+	 */
+	protected SavableInt progress = new SavableInt("progress");
+	private SavableInt percentStored = new SavableInt("percentStored");
+	private SavableInt percentRequired = new SavableInt("percentRequired");
+	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, percentRequired, progress);
+	private int xpRequired = 0;
 	
 	public TileEntityAutoAnvil() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
+	
+	private int stackSizeToBeUsedInRepair;
 
 	@Override
 	public void updateEntity() {
@@ -76,32 +72,52 @@ ITankCallback  {
 		if (!worldObj.isRemote){
 
 			if (hasChanged) {
-				if (inventory.getStackInSlot(INPUT_STACK) != null && inventory.getStackInSlot(MODIFIER_STACK) != null && inventory.getStackInSlot(OUTPUT_STACK) == null) {
-					updateRepairOutput();
+				
+				xpRequired = updateRepairOutput(false);
+				if (xpRequired == 0) {
+					progress.setValue(0);
+				}
+				
+				percentStored.setValue((int) tanks.getPercentFull());
+				percentRequired.setValue((int)(100.0 / tanks.getCapacity() * xpRequired));
+			} else {
+				if (xpRequired > 0 && tanks.getTankAmount() >= xpRequired) {
+					progress.add(1);
+					if (progress.getValue() >= getSpeed()) {
+						xpRequired = updateRepairOutput(true);
+						progress.setValue(0);
+					}
+				}else {
+					progress.setValue(0);
 				}
 			}
-
+			
 			hasChanged = false;
 		}
 
 	}
-	
-    /**
-     * called when the Anvil Input Slot changes, calculates the new result and puts it in the output slot
-     */
-	public void updateRepairOutput()
+
+	public int getSpeed() {
+		return 20;
+	}
+
+	public int updateRepairOutput(boolean doIt)
     {
-        ItemStack itemstack = inventory.getStackInSlot(INPUT_STACK);
-        this.maximumCost = 0;
+        ItemStack inputStack = inventory.getStackInSlot(INPUT_STACK);
+        int maximumCost = 0;
         int i = 0;
         byte b0 = 0;
         int j = 0;
         
-        ItemStack itemstack1 = itemstack.copy();
-        ItemStack itemstack2 = inventory.getStackInSlot(MODIFIER_STACK);
-        Map map = EnchantmentHelper.getEnchantments(itemstack1);
+        if (inputStack == null) {
+        	return 0;
+        }
+        
+        ItemStack inputStackCopy = inputStack.copy();
+        ItemStack modifierStack = inventory.getStackInSlot(MODIFIER_STACK);
+        Map inputStackEnchantments = EnchantmentHelper.getEnchantments(inputStackCopy);
         boolean flag = false;
-        int k = b0 + itemstack.getRepairCost() + (itemstack2 == null ? 0 : itemstack2.getRepairCost());
+        int k = b0 + inputStack.getRepairCost() + (modifierStack == null ? 0 : modifierStack.getRepairCost());
         this.stackSizeToBeUsedInRepair = 0;
         int l;
         int i1;
@@ -111,66 +127,64 @@ ITankCallback  {
         Iterator iterator;
         Enchantment enchantment;
 
-        if (itemstack2 != null)
+        if (modifierStack != null)
         {
-            flag = itemstack2.itemID == Item.enchantedBook.itemID && Item.enchantedBook.func_92110_g(itemstack2).tagCount() > 0;
+            flag = modifierStack.itemID == Item.enchantedBook.itemID && Item.enchantedBook.func_92110_g(modifierStack).tagCount() > 0;
 
-            if (itemstack1.isItemStackDamageable() && Item.itemsList[itemstack1.itemID].getIsRepairable(itemstack, itemstack2))
+            if (inputStackCopy.isItemStackDamageable() && Item.itemsList[inputStackCopy.itemID].getIsRepairable(inputStack, modifierStack))
             {
-                l = Math.min(itemstack1.getItemDamageForDisplay(), itemstack1.getMaxDamage() / 4);
+                l = Math.min(inputStackCopy.getItemDamageForDisplay(), inputStackCopy.getMaxDamage() / 4);
 
                 if (l <= 0)
                 {
-                    this.maximumCost = 0;
-                    return;
+                    return 0;
                 }
 
-                for (i1 = 0; l > 0 && i1 < itemstack2.stackSize; ++i1)
+                for (i1 = 0; l > 0 && i1 < modifierStack.stackSize; ++i1)
                 {
-                    j1 = itemstack1.getItemDamageForDisplay() - l;
-                    itemstack1.setItemDamage(j1);
-                    i += Math.max(1, l / 100) + map.size();
-                    l = Math.min(itemstack1.getItemDamageForDisplay(), itemstack1.getMaxDamage() / 4);
+                    j1 = inputStackCopy.getItemDamageForDisplay() - l;
+                    inputStackCopy.setItemDamage(j1);
+                    i += Math.max(1, l / 100) + inputStackEnchantments.size();
+                    l = Math.min(inputStackCopy.getItemDamageForDisplay(), inputStackCopy.getMaxDamage() / 4);
                 }
 
                 this.stackSizeToBeUsedInRepair = i1;
             }
             else
             {
-                if (!flag && (itemstack1.itemID != itemstack2.itemID || !itemstack1.isItemStackDamageable()))
+                if (!flag && (inputStackCopy.itemID != modifierStack.itemID || !inputStackCopy.isItemStackDamageable()))
                 {
-                    this.maximumCost = 0;
-                    return;
+                    return 0;
                 }
 
-                if (itemstack1.isItemStackDamageable() && !flag)
+                if (inputStackCopy.isItemStackDamageable() && !flag)
                 {
-                    l = itemstack.getMaxDamage() - itemstack.getItemDamageForDisplay();
-                    i1 = itemstack2.getMaxDamage() - itemstack2.getItemDamageForDisplay();
-                    j1 = i1 + itemstack1.getMaxDamage() * 12 / 100;
+                    l = inputStack.getMaxDamage() - inputStack.getItemDamageForDisplay();
+                    i1 = modifierStack.getMaxDamage() - modifierStack.getItemDamageForDisplay();
+                    j1 = i1 + inputStackCopy.getMaxDamage() * 12 / 100;
                     int i2 = l + j1;
-                    k1 = itemstack1.getMaxDamage() - i2;
+                    k1 = inputStackCopy.getMaxDamage() - i2;
 
                     if (k1 < 0)
                     {
                         k1 = 0;
                     }
 
-                    if (k1 < itemstack1.getItemDamage())
+                    if (k1 < inputStackCopy.getItemDamage())
                     {
-                        itemstack1.setItemDamage(k1);
+                        inputStackCopy.setItemDamage(k1);
                         i += Math.max(1, j1 / 100);
                     }
                 }
 
-                Map map1 = EnchantmentHelper.getEnchantments(itemstack2);
+                Map map1 = EnchantmentHelper.getEnchantments(modifierStack);
                 iterator = map1.keySet().iterator();
 
                 while (iterator.hasNext())
                 {
                     j1 = ((Integer)iterator.next()).intValue();
                     enchantment = Enchantment.enchantmentsList[j1];
-                    k1 = map.containsKey(Integer.valueOf(j1)) ? ((Integer)map.get(Integer.valueOf(j1))).intValue() : 0;
+                    k1 = inputStackEnchantments.containsKey(Integer.valueOf(j1)) ? ((Integer)inputStackEnchantments.get(Integer.valueOf(j1))).intValue() : 0;
                     l1 = ((Integer)map1.get(Integer.valueOf(j1))).intValue();
                     int j2;
 
@@ -186,9 +200,9 @@ ITankCallback  {
 
                     l1 = j2;
                     int k2 = l1 - k1;
-                    boolean flag1 = enchantment.canApply(itemstack);
+                    boolean flag1 = enchantment.canApply(inputStack);
 
-                    Iterator iterator1 = map.keySet().iterator();
+                    Iterator iterator1 = inputStackEnchantments.keySet().iterator();
 
                     while (iterator1.hasNext())
                     {
@@ -208,7 +222,7 @@ ITankCallback  {
                             l1 = enchantment.getMaxLevel();
                         }
 
-                        map.put(Integer.valueOf(j1), Integer.valueOf(l1));
+                        inputStackEnchantments.put(Integer.valueOf(j1), Integer.valueOf(l1));
                         int i3 = 0;
 
                         switch (enchantment.getWeight())
@@ -245,11 +259,11 @@ ITankCallback  {
 
             l = 0;
 
-            for (iterator = map.keySet().iterator(); iterator.hasNext(); k += l + k1 * l1)
+            for (iterator = inputStackEnchantments.keySet().iterator(); iterator.hasNext(); k += l + k1 * l1)
             {
                 j1 = ((Integer)iterator.next()).intValue();
                 enchantment = Enchantment.enchantmentsList[j1];
-                k1 = ((Integer)map.get(Integer.valueOf(j1))).intValue();
+                k1 = ((Integer)inputStackEnchantments.get(Integer.valueOf(j1))).intValue();
                 l1 = 0;
                 ++l;
 
@@ -286,28 +300,28 @@ ITankCallback  {
                 k = Math.max(1, k / 2);
             }
 
-            if (flag && itemstack1!=null && !Item.itemsList[itemstack1.itemID].isBookEnchantable(itemstack1,itemstack2))
+            if (flag && inputStackCopy!=null && !Item.itemsList[inputStackCopy.itemID].isBookEnchantable(inputStackCopy,modifierStack))
             {
-                itemstack1 = null;
+                inputStackCopy = null;
             }
 
-            this.maximumCost = k + i;
+            maximumCost = k + i;
 
             if (i <= 0)
             {
-                itemstack1 = null;
+                inputStackCopy = null;
             }
 
-            if (itemstack1 != null)
+            if (inputStackCopy != null)
             {
-                i1 = itemstack1.getRepairCost();
+                i1 = inputStackCopy.getRepairCost();
 
-                if (itemstack2 != null && i1 < itemstack2.getRepairCost())
+                if (modifierStack != null && i1 < modifierStack.getRepairCost())
                 {
-                    i1 = itemstack2.getRepairCost();
+                    i1 = modifierStack.getRepairCost();
                 }
 
-                if (itemstack1.hasDisplayName())
+                if (inputStackCopy.hasDisplayName())
                 {
                     i1 -= 9;
                 }
@@ -318,27 +332,40 @@ ITankCallback  {
                 }
 
                 i1 += 2;
-                itemstack1.setRepairCost(i1);
-                EnchantmentHelper.setEnchantments(map, itemstack1);
+                inputStackCopy.setRepairCost(i1);
+                EnchantmentHelper.setEnchantments(inputStackEnchantments, inputStackCopy);
                 
-                if (tanks.getTankAmount() >= i1) {
-                	tanks.drain(i1, true);
-		            inventory.setInventorySlotContents(INPUT_STACK, (ItemStack)null);
-		            inventory.setInventorySlotContents(MODIFIER_STACK, (ItemStack)null);
-		            inventory.setInventorySlotContents(OUTPUT_STACK, itemstack1);
+                int requiredXP = EnchantmentUtils.getExperienceForLevel(maximumCost);
+                if (tanks.getTankAmount() >= requiredXP && doIt) {
+                	tanks.drain(requiredXP, true);
+		            inventory.setInventorySlotContents(INPUT_STACK, null);
+		            inventory.setInventorySlotContents(MODIFIER_STACK, null);
+		            inventory.setInventorySlotContents(OUTPUT_STACK, inputStackCopy);
+		            return 0;
                 }
+                return requiredXP;
             }
         }
+        return 0;
+        
     }
 
-	public int getLevelsAvailable() {
-		return levelsAvailable.getValue();
+	public int getPercentRequired() {
+		return percentRequired.getValue();
+	}
+	
+	public int getPercentStored() {
+		return percentStored.getValue();
 	}
 
-	public int getMode() {
-		return mode.getValue();
+	public int getProgress() {
+		return progress.getValue();
 	}
 
+	public double getPercentProgress() {
+		return 100.0 / getSpeed() * getProgress();
+	}
+	
 	public int getExperience() {
 		return tanks.getTankAmount();
 	}
@@ -348,8 +375,9 @@ ITankCallback  {
 		super.readFromNBT(tag);
 		inventory.readFromNBT(tag);
 		tanks.readFromNBT(tag);
-		mode.readFromNBT(tag);
-		levelsAvailable.readFromNBT(tag);
+		percentStored.readFromNBT(tag);
+		percentRequired.readFromNBT(tag);
+		progress.readFromNBT(tag);
 	}
 
 	@Override
@@ -357,8 +385,9 @@ ITankCallback  {
 		super.writeToNBT(tag);
 		inventory.writeToNBT(tag);
 		tanks.writeToNBT(tag);
-		mode.writeToNBT(tag);
-		levelsAvailable.writeToNBT(tag);
+		percentStored.writeToNBT(tag);
+		percentRequired.writeToNBT(tag);
+		progress.writeToNBT(tag);
 	}
 
 	@Override
@@ -396,14 +425,7 @@ ITankCallback  {
 
 	@Override
 	public void onClientButtonClicked(int button) {
-		switch(button) {
-		case BUTTON_LOWEST:
-			mode.setValue(MODE_LOWEST);
-			break;
-		case BUTTON_HIGHEST:
-			mode.setValue(MODE_HIGHEST);
-			break;
-		}
+
 	}
 
 	@Override

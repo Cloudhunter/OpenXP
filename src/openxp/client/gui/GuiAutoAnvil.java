@@ -29,9 +29,23 @@ public class GuiAutoAnvil extends SimpleGui {
         int top = (height - ySize) / 2;
         this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize);
 
-        String s = String.format("Stored Levels: %s", tileentity.getLevelsAvailable());
-        fontRenderer.drawString(s, left + xSize - 10 - fontRenderer.getStringWidth(s), top + 64, 4210752);
-        
+        double required = ((double)tileentity.getPercentRequired()) / 100.0;
+		int tankHeightRequired = (int)(67.0 * required);
+
+        this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
+		this.drawTexturedModalRect(left + 146, top + 9 + (67-tankHeightRequired), 200, 67-tankHeightRequired , 24, tankHeightRequired);
+
+		double stored = ((double)tileentity.getPercentStored()) / 100.0;
+		int tankHeight = (int)(67.0 * stored);
+
+        this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
+		this.drawTexturedModalRect(left + 146, top + 9 + (67-tankHeight), 176, 67-tankHeight , 24, tankHeight);
+
+		double progress = tileentity.getPercentProgress() / 100.0;
+		int progressWidth = (int)(29.0 * progress);
+
+		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
+		this.drawTexturedModalRect(left + 66, top + 36, 176, 67, progressWidth, 12);
     }
 	
 	
