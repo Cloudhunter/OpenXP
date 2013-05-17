@@ -34,31 +34,72 @@ ITankCallback {
 	public static final int INPUT_SLOT = 0;
 	public static final int OUTPUT_SLOT = 1;
 
+	/**
+	 * These are the slot positions of the GUI. x,y, x,y
+	 * Used in common/client proxy gui handler
+	 */
 	public static final int[] SLOTS = new int[] { 48, 34, 102, 34 };
 
+	/**
+	 * The method registry is used for the computercraft API
+	 */
 	protected PeripheralMethodRegistry methodRegistry;
+	
+	/**
+	 * The progress bar in the GUI
+	 */
 	protected SavableInt progress = new SavableInt("progress");
+	
+	/**
+	 * The percentage of liquid stored
+	 */
 	protected SavableInt percentStored = new SavableInt("percentStored");
+	
+	/**
+	 * A wrapper around the tank
+	 */
 	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.XP_PER_BOTTLE * 32));
+	
+	/**
+	 * A wrapper around the inventory
+	 */
 	protected BaseInventory inventory = new BaseInventory("xpbottler", true, 2);
+	
+	/**
+	 * Whenever the inventory or tank changes, this changes to true for a tick
+	 */
 	protected boolean hasChanged = false;
+	
+	/**
+	 * A list of the SavableInts that we want auto-synced with the client
+	 */
 	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, progress);
 
 	public TileEntityXPBottler() {
+		
+		// add callbacks for when the inventory or tank changes
+		// (see onTankChanged/onInventoryChanged)
 		inventory.addCallback(this);
 		tanks.addCallback(this);
+		
+		// create a new method registry for this tile entity.
+		// basically, this finds any method annotated with @LuaMethod and
+		// exposes it to lua
 		methodRegistry = new PeripheralMethodRegistry(this);
 	}
 
+	/**
+	 * The time it takes to empty/fill a bottle
+	 */
 	public int getSpeed() {
 		return 20;
 	}
 
 	@Override
 	public void updateEntity() {
-		
+
 		super.updateEntity();
-		
+
 		if (!worldObj.isRemote) {
 
 			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);
@@ -83,39 +124,52 @@ ITankCallback {
 			methodRegistry.setWorld(worldObj);
 		}
 	}
-	
+
+	/**
+	 * Drain the bottles in the input stack if they're XP bottles and if there's
+	 * space in the tank
+	 */
 	public void drainBottles() {
 
+		// validate that everything is OK regarding slots and the tank
 		if (tanks.getTankAmount() + EnchantmentUtils.XP_PER_BOTTLE > tanks.getCapacity() ||
 				!areSlotsValid(Item.expBottle, Item.glassBottle)) {
-
 			progress.setValue(0);
 			return;
 		}
 
+		// update the progress bar in the gui (this gets automatically synced)
 		progress.add(1);
 
+		// if the progress is complete, lets fill the tank, fix the slots and reset the progress
 		if (progress.getValue() >= getSpeed()) {
-			switchSlots(Item.expBottle, Item.glassBottle);
+			switchSlots(Item.glassBottle);
 			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.XP_PER_BOTTLE), true);
 			progress.setValue(0);
 		}
 
 	}
 
+	/**
+	 * Fill empty bottles
+	 */
 	public void fillBottles() {
 
+		// check we have enough fluid in the tank and the slots are correct
 		if (tanks.getTankAmount() < EnchantmentUtils.XP_PER_BOTTLE ||
-			!areSlotsValid(Item.glassBottle, Item.expBottle)) {
+				!areSlotsValid(Item.glassBottle, Item.expBottle)) {
 
 			progress.setValue(0);
 			return;
 		}
 
+		// update the progress bar
 		progress.add(1);
 
+		// if the progress bar reaches the end, reset the progress, switch the slots and drain
+		// the tank
 		if (progress.getValue() >= getSpeed()) {
-			switchSlots(Item.glassBottle, Item.expBottle);
+			switchSlots(Item.expBottle);
 			tanks.drain(EnchantmentUtils.XP_PER_BOTTLE, true);
 			progress.setValue(0);
 		}
@@ -134,11 +188,18 @@ ITankCallback {
 		return (
 				outputStack == null ||
 				(outputStack.getItem() == outputItem && outputStack.stackSize < outputStack.getMaxStackSize())
-		);
+				);
 
 	}
-
-	private boolean switchSlots(Item inputItem, Item outputItem) {
+	
+	/**
+	 * Decreases the size of the input slot and increases the size of the
+	 * 
+	 * @param inputItem
+	 * @param outputItem
+	 * @return success
+	 */
+	private boolean switchSlots(Item outputItem) {
 
 		ItemStack outputStack = inventory.getStackInSlot(OUTPUT_SLOT);
 
@@ -155,6 +216,10 @@ ITankCallback {
 		return false;
 	}
 
+	/*
+	 * Property getters and setters
+	 */
+	
 	public double getPercentProgress() {
 		return 100.0 / getSpeed() * getProgress();
 	}
@@ -170,7 +235,20 @@ ITankCallback {
 	public void setPercentStored(int value) {
 		percentStored.setValue(value);
 	}
+	
+	/*
+	 * Methods exposed to ComputerCraft Lua
+	 */
 
+	@LuaMethod(onTick = true)
+	public int getXPStored(dan200.computer.api.IComputerAccess computer) {
+		return tanks.getTankAmount();
+	}
+
+	/*
+	 * Reading and saving from disk
+	 */
+	
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
@@ -330,11 +408,11 @@ ITankCallback {
 	}
 
 
-	
+
 	/***
 	 * ComputerCraft Interfaces
 	 */
-	
+
 	public String getType() {
 		return "xpbottler";
 	}
@@ -357,10 +435,5 @@ ITankCallback {
 
 	public void detach(dan200.computer.api.IComputerAccess computer) {
 	}
-	
-	@LuaMethod(onTick = true)
-	public int getXPStored(dan200.computer.api.IComputerAccess computer) {
-		return tanks.getTankAmount();
-	}
-	
+
 }
