@@ -1,11 +1,8 @@
 package openxp;
 
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.Property;
 import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
 import openxp.common.block.BlockAutoAnvil;
@@ -13,7 +10,6 @@ import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
@@ -21,8 +17,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 
 @Mod( modid = "OpenXP", name = "OpenXP", version = "0.0.1")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)

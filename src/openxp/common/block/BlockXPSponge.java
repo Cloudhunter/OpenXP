@@ -1,17 +1,13 @@
 package openxp.common.block;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityXPBottler;
-import openxp.common.tileentity.TileEntityXPSponge;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import openxp.OpenXP;
+import openxp.common.tileentity.TileEntityXPSponge;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockXPSponge extends BlockContainer {
 	

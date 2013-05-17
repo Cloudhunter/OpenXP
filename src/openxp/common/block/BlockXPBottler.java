@@ -12,6 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openxp.OpenXP;
+import openxp.common.ccintegration.PeripheralRegistry;
 import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.util.BlockSide;
 import openxp.common.util.BlockUtils;
@@ -35,6 +36,7 @@ public class BlockXPBottler extends BlockContainer {
 		setCreativeTab(OpenXP.tabOpenXP);
 		GameRegistry.registerBlock(this, "xpbottler");
 		GameRegistry.registerTileEntity(TileEntityXPBottler.class, "xpbottler");
+		PeripheralRegistry.registerTileEntity(TileEntityXPBottler.class, "xpbottler");
 		setUnlocalizedName("openxp.xpbottler");
 	}
 

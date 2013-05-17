@@ -1,16 +1,15 @@
 package openxp.client;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.world.IBlockAccess;
 import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {

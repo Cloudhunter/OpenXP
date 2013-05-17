@@ -1,10 +1,6 @@
-package openxp.client.core;
+package openxp.common.core;
 
 import java.util.ArrayList;
-
-import com.google.common.primitives.Ints;
-
-import net.minecraft.nbt.NBTTagCompound;
 
 public class GuiValueHolder extends ArrayList<SavableInt> {
 	

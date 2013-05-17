@@ -1,30 +1,10 @@
 package openxp.client.gui;
 
-import java.lang.reflect.Field;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.GLU;
-
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPBottler;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiEnchantment;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.model.ModelBook;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ContainerEnchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityEnchantmentTable;
-import net.minecraft.util.EnchantmentNameParts;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
+
+import org.lwjgl.opengl.GL11;
 
 public class GuiAutomatedEnchantment extends SimpleGui {
 	

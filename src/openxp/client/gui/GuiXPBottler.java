@@ -1,13 +1,10 @@
 package openxp.client.gui;
 
-import org.lwjgl.opengl.GL11;
-
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityXPBottler;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
-import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
 
 public class GuiXPBottler extends SimpleGui {
 

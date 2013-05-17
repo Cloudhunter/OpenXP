@@ -1,4 +1,4 @@
-package openxp.client.core;
+package openxp.common.core;
 
 import java.util.ArrayList;
 import java.util.List;

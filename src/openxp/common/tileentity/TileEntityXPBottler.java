@@ -6,7 +6,6 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.src.ModLoader;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
@@ -14,21 +13,19 @@ import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
-import openxp.client.core.BaseInventory;
-import openxp.client.core.BaseTankContainer;
-import openxp.client.core.BaseTileEntity;
-import openxp.client.core.GuiValueHolder;
-import openxp.client.core.IInventoryCallback;
-import openxp.client.core.ITankCallback;
-import openxp.client.core.SavableInt;
+import openxp.common.ccintegration.LuaMethod;
+import openxp.common.core.BaseInventory;
+import openxp.common.core.BaseTankContainer;
+import openxp.common.core.BaseTileEntity;
+import openxp.common.core.GuiValueHolder;
+import openxp.common.core.IInventoryCallback;
+import openxp.common.core.ITankCallback;
+import openxp.common.core.SavableInt;
 import openxp.common.util.EnchantmentUtils;
-import openxp.common.util.IIsPeripheral;
-import openxp.common.util.LuaMethod;
-import openxp.common.util.PeripheralMethodRegistry;
 
 public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
 ISidedInventory, ITankContainer, IHasSimpleGui, IInventoryCallback,
-ITankCallback, IIsPeripheral {
+ITankCallback {
 
 	public static final int MODE_FILL = 0;
 	public static final int MODE_DRAIN = 1;
@@ -36,8 +33,6 @@ ITankCallback, IIsPeripheral {
 	public static final int INPUT_SLOT = 0;
 	public static final int OUTPUT_SLOT = 1;
 	
-	private PeripheralMethodRegistry methodRegistry = new PeripheralMethodRegistry(this, "xpbottler");
-
 	/**
 	 * These are the slot positions of the GUI. x,y, x,y
 	 * Used in common/client proxy gui handler
@@ -392,11 +387,6 @@ ITankCallback, IIsPeripheral {
 	@Override
 	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
 		return inventory.isStackValidForSlot(i, itemstack);
-	}
-
-	@Override
-	public PeripheralMethodRegistry getMethodRegistry() {
-		return methodRegistry;
 	}
 
 

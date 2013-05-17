@@ -1,10 +1,9 @@
 package openxp.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.util.StatCollector;
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
-import net.minecraft.util.StatCollector;
 
 public class SimpleGui extends GuiContainer {
 

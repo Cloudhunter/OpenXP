@@ -2,16 +2,13 @@ package openxp.common.tileentity;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
@@ -22,15 +19,14 @@ import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
-import openxp.OpenXP;
 import openxp.api.IHasSimpleGui;
-import openxp.client.core.BaseInventory;
-import openxp.client.core.BaseTankContainer;
-import openxp.client.core.BaseTileEntity;
-import openxp.client.core.GuiValueHolder;
-import openxp.client.core.IInventoryCallback;
-import openxp.client.core.ITankCallback;
-import openxp.client.core.SavableInt;
+import openxp.common.core.BaseInventory;
+import openxp.common.core.BaseTankContainer;
+import openxp.common.core.BaseTileEntity;
+import openxp.common.core.GuiValueHolder;
+import openxp.common.core.IInventoryCallback;
+import openxp.common.core.ITankCallback;
+import openxp.common.core.SavableInt;
 import openxp.common.util.EnchantmentUtils;
 /**
  * The TileEntity object for the Automatic Anvil

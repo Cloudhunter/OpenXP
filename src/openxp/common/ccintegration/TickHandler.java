@@ -1,14 +1,14 @@
-package openxp.common.util;
+package openxp.common.ccintegration;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import net.minecraft.world.World;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;

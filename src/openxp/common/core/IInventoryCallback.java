@@ -1,6 +1,5 @@
-package openxp.client.core;
+package openxp.common.core;
 
-import net.minecraft.inventory.InventoryBasic;
 
 public interface IInventoryCallback {
 	public void onInventoryChanged(BaseInventory inventory);

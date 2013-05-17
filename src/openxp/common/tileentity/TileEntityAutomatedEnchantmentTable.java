@@ -15,12 +15,12 @@ import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
-import openxp.client.core.BaseInventory;
-import openxp.client.core.BaseTankContainer;
-import openxp.client.core.GuiValueHolder;
-import openxp.client.core.IInventoryCallback;
-import openxp.client.core.ITankCallback;
-import openxp.client.core.SavableInt;
+import openxp.common.core.BaseInventory;
+import openxp.common.core.BaseTankContainer;
+import openxp.common.core.GuiValueHolder;
+import openxp.common.core.IInventoryCallback;
+import openxp.common.core.ITankCallback;
+import openxp.common.core.SavableInt;
 import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 

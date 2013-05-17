@@ -2,27 +2,20 @@ package openxp.common.tileentity;
 
 import java.util.List;
 
-import openxp.client.core.BaseTankContainer;
-import openxp.client.core.BaseTileEntity;
-import openxp.client.core.ITankCallback;
-import openxp.client.core.SavableInt;
-import openxp.common.util.EnchantmentUtils;
-
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
-import net.minecraftforge.liquids.LiquidContainerRegistry;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
+import openxp.common.core.BaseTankContainer;
+import openxp.common.core.BaseTileEntity;
+import openxp.common.core.SavableInt;
+import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 

@@ -1,42 +1,28 @@
 package openxp.common;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.src.ModLoader;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.liquids.LiquidDictionary;
+import net.minecraftforge.liquids.LiquidStack;
 import openxp.OpenXP;
-import openxp.client.core.BaseTileEntity;
-import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockAutoAnvil;
+import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
+import openxp.common.ccintegration.PeripheralRegistry;
+import openxp.common.ccintegration.TickHandler;
 import openxp.common.container.ContainerGeneric;
+import openxp.common.core.BaseTileEntity;
 import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.TileEntityXPBottler;
-import openxp.common.util.PeripheralHandler;
-import openxp.common.util.TickHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computer.api.ComputerCraftAPI;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEnchantmentTable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ContainerEnchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.src.ModLoader;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.liquids.LiquidContainerData;
-import net.minecraftforge.liquids.LiquidContainerRegistry;
-import net.minecraftforge.liquids.LiquidDictionary;
-import net.minecraftforge.liquids.LiquidStack;
 
 public class CommonProxy implements IGuiHandler
 {   
@@ -48,7 +34,7 @@ public class CommonProxy implements IGuiHandler
 		
 		if (ModLoader.isModLoaded("ComputerCraft")) {
 			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
-			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralHandler());
+			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralRegistry());
 		}
 	}
 
