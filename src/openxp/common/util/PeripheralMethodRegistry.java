@@ -1,23 +1,23 @@
 package openxp.common.util;
 
-import net.minecraft.world.World;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import dan200.computer.api.IComputerAccess;
 
-public class PeripheralMethodRegistry {
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import dan200.computer.api.IComputerAccess;
+import dan200.computer.api.IHostedPeripheral;
+
+public class PeripheralMethodRegistry implements IHostedPeripheral {
 
 	private World world;
 
 	private ArrayList<IMethodCallback> methods = new ArrayList<IMethodCallback>();
 
 	public PeripheralMethodRegistry(final Object target) {
-		
+	
 		Method[] methods = target.getClass().getMethods();
 		
 		for (final Method method : methods) {
@@ -92,5 +92,35 @@ public class PeripheralMethodRegistry {
 
 	public int Int(Object o) {
 		return (int) (double) (Double) o;
+	}
+
+	@Override
+	public String getType() {
+		return "xpbottler";
+	}
+
+	@Override
+	public boolean canAttachToSide(int side) {
+		return true;
+	}
+
+	@Override
+	public void attach(IComputerAccess computer) {
+	}
+
+	@Override
+	public void detach(IComputerAccess computer) {
+	}
+
+	@Override
+	public void update() {
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound nbttagcompound) {
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound nbttagcompound) {
 	}
 }

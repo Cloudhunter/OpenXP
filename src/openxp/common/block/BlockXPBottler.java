@@ -1,20 +1,17 @@
 package openxp.common.block;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import openxp.common.util.BlockSide;
 import openxp.common.util.BlockUtils;
@@ -24,8 +21,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockXPBottler extends BlockContainer {
 
-	private Class tileEntityClass = TileEntityXPBottler.class;
-	
 	public static class icons {
 		public static Icon back;
 		public static Icon top;
@@ -39,12 +34,7 @@ public class BlockXPBottler extends BlockContainer {
 		setHardness(0.5F);
 		setCreativeTab(OpenXP.tabOpenXP);
 		GameRegistry.registerBlock(this, "xpbottler");
-
-		if (ModLoader.isModLoaded("ComputerCraft")) {
-			tileEntityClass = openxp.common.tileentity.xpbottler.XPBottlerPeripheral.class;
-		}
-		
-		GameRegistry.registerTileEntity(tileEntityClass, "xpbottler");
+		GameRegistry.registerTileEntity(TileEntityXPBottler.class, "xpbottler");
 		setUnlocalizedName("openxp.xpbottler");
 	}
 
@@ -59,9 +49,6 @@ public class BlockXPBottler extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		try {
-			return (TileEntity) tileEntityClass.newInstance();
-		}catch(Exception e) {}
 		return new TileEntityXPBottler();
 	}
 	

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import openxp.OpenXP;
+import openxp.client.core.BaseTileEntity;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
@@ -11,6 +12,7 @@ import openxp.common.container.ContainerGeneric;
 import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.util.PeripheralHandler;
 import openxp.common.util.TickHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -18,6 +20,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import dan200.computer.api.ComputerCraftAPI;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,6 +46,7 @@ public class CommonProxy implements IGuiHandler
 		
 		if (ModLoader.isModLoaded("ComputerCraft")) {
 			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
+			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralHandler());
 		}
 	}
 

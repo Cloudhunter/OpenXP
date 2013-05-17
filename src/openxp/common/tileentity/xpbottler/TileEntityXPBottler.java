@@ -21,29 +21,27 @@ import openxp.client.core.IInventoryCallback;
 import openxp.client.core.ITankCallback;
 import openxp.client.core.SavableInt;
 import openxp.common.util.EnchantmentUtils;
+import openxp.common.util.IIsPeripheral;
 import openxp.common.util.LuaMethod;
 import openxp.common.util.PeripheralMethodRegistry;
 
 public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
 ISidedInventory, ITankContainer, IHasSimpleGui, IInventoryCallback,
-ITankCallback {
+ITankCallback, IIsPeripheral {
 
 	public static final int MODE_FILL = 0;
 	public static final int MODE_DRAIN = 1;
 
 	public static final int INPUT_SLOT = 0;
 	public static final int OUTPUT_SLOT = 1;
+	
+	private PeripheralMethodRegistry methodRegistry = new PeripheralMethodRegistry(this);
 
 	/**
 	 * These are the slot positions of the GUI. x,y, x,y
 	 * Used in common/client proxy gui handler
 	 */
 	public static final int[] SLOTS = new int[] { 48, 34, 102, 34 };
-
-	/**
-	 * The method registry is used for the computercraft API
-	 */
-	protected PeripheralMethodRegistry methodRegistry;
 	
 	/**
 	 * The progress bar in the GUI
@@ -82,10 +80,6 @@ ITankCallback {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 		
-		// create a new method registry for this tile entity.
-		// basically, this finds any method annotated with @LuaMethod and
-		// exposes it to lua
-		methodRegistry = new PeripheralMethodRegistry(this);
 	}
 
 	/**
@@ -115,13 +109,6 @@ ITankCallback {
 			}
 
 			hasChanged = false;
-		}
-	}
-
-	@Override
-	protected void initialize() {
-		if (worldObj != null) {
-			methodRegistry.setWorld(worldObj);
 		}
 	}
 
@@ -407,33 +394,10 @@ ITankCallback {
 		return inventory.isStackValidForSlot(i, itemstack);
 	}
 
-
-
-	/***
-	 * ComputerCraft Interfaces
-	 */
-
-	public String getType() {
-		return "xpbottler";
+	@Override
+	public PeripheralMethodRegistry getMethodRegistry() {
+		return methodRegistry;
 	}
 
-	public String[] getMethodNames() {
-		return methodRegistry.getMethodNames();
-	}
-
-	public Object[] callMethod(dan200.computer.api.IComputerAccess computer, int methodId,
-			Object[] arguments) throws Exception {
-		return methodRegistry.callMethod(computer, methodId, arguments);
-	}
-
-	public boolean canAttachToSide(int side) {
-		return true;
-	}
-
-	public void attach(dan200.computer.api.IComputerAccess computer) {
-	}
-
-	public void detach(dan200.computer.api.IComputerAccess computer) {
-	}
 
 }
