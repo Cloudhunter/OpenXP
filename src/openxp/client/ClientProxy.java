@@ -5,11 +5,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import openxp.OpenXP;
+import openxp.client.gui.GuiAutoAnvil;
 import openxp.client.gui.GuiAutomatedEnchantment;
 import openxp.client.gui.GuiXPBottler;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
+import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.TileEntityXPSponge;
 import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
@@ -39,6 +41,8 @@ public class ClientProxy extends CommonProxy {
 				  return new GuiAutomatedEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS), (TileEntityAutomatedEnchantmentTable)tile);
 			}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
 				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
+			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
+				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
 			}
 		}
 		return null;

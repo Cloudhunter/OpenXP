@@ -5,10 +5,12 @@ import java.lang.reflect.Modifier;
 
 import openxp.OpenXP;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
+import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.item.ItemLiquidXP;
+import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import openxp.common.util.TickHandler;
@@ -51,6 +53,7 @@ public class CommonProxy implements IGuiHandler
 		OpenXP.Blocks.XPSponge = new BlockXPSponge();
 		OpenXP.Blocks.enchantmentTable = new BlockAutomatedEnchantmentTable();
 		OpenXP.Blocks.XPBottler = new BlockXPBottler();
+		OpenXP.Blocks.autoAnvil = new BlockAutoAnvil();
 	}
 	
 	private void initItems()
@@ -75,6 +78,8 @@ public class CommonProxy implements IGuiHandler
 			return new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS);
 		}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
 			return new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS);	
+		}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
+			return new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS);
 		}
 		
 		return null;
