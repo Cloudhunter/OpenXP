@@ -7,13 +7,16 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.util.BlockSide;
 import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -21,6 +24,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockXPBottler extends BlockContainer {
 
+	private Class tileEntityClass = TileEntityXPBottler.class;
+	
 	public static class icons {
 		public static Icon back;
 		public static Icon top;
@@ -34,7 +39,12 @@ public class BlockXPBottler extends BlockContainer {
 		setHardness(0.5F);
 		setCreativeTab(OpenXP.tabOpenXP);
 		GameRegistry.registerBlock(this, "xpbottler");
-		GameRegistry.registerTileEntity(TileEntityXPBottler.class, "xpbottler");
+
+		if (ModLoader.isModLoaded("ComputerCraft")) {
+			tileEntityClass = openxp.common.tileentity.xpbottler.XPBottlerPeripheral.class;
+		}
+		
+		GameRegistry.registerTileEntity(tileEntityClass, "xpbottler");
 		setUnlocalizedName("openxp.xpbottler");
 	}
 
@@ -49,6 +59,9 @@ public class BlockXPBottler extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
+		try {
+			return (TileEntity) tileEntityClass.newInstance();
+		}catch(Exception e) {}
 		return new TileEntityXPBottler();
 	}
 	
@@ -69,10 +82,10 @@ public class BlockXPBottler extends BlockContainer {
     public Icon getIcon(int i, int j) {
     	if (j == 0 && i == 3)
 			return icons.front;
-    	if (i == 1)
+    	if (i == BlockSide.TOP)
 			return icons.top;
-		else if (i == 0)
-			return icons.back;
+		else if (i == BlockSide.BOTTOM)
+			return icons.bottom;
 		else if (i == j)
 			return icons.front;
 		else if (j >= 0 && j < 6 && ForgeDirection.values()[j].getOpposite().ordinal() == i)

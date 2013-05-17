@@ -8,7 +8,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
 import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
-import openxp.common.block.BlockPeripheralEnchantmentTable;
+import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
@@ -46,7 +46,7 @@ public class OpenXP
 	{
 		public static BlockXPSponge XPSponge;
 		public static BlockXPBottler XPBottler;
-		public static BlockPeripheralEnchantmentTable enchantmentTable;
+		public static BlockAutomatedEnchantmentTable enchantmentTable;
 	}
 	
 	public static class Items

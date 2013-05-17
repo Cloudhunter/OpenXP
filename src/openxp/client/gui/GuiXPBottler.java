@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
-import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.StatCollector;

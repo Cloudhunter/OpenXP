@@ -1,4 +1,4 @@
-package openxp.common.tileentity;
+package openxp.common.tileentity.xpbottler;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -21,6 +21,8 @@ import openxp.client.core.IInventoryCallback;
 import openxp.client.core.ITankCallback;
 import openxp.client.core.SavableInt;
 import openxp.common.util.EnchantmentUtils;
+import openxp.common.util.LuaMethod;
+import openxp.common.util.PeripheralMethodRegistry;
 
 public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
 ISidedInventory, ITankContainer, IHasSimpleGui, IInventoryCallback,
@@ -34,17 +36,18 @@ ITankCallback {
 
 	public static final int[] SLOTS = new int[] { 48, 34, 102, 34 };
 
+	protected PeripheralMethodRegistry methodRegistry;
 	protected SavableInt progress = new SavableInt("progress");
-	private int mode = MODE_FILL;
 	protected SavableInt percentStored = new SavableInt("percentStored");
 	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.XP_PER_BOTTLE * 32));
 	protected BaseInventory inventory = new BaseInventory("xpbottler", true, 2);
 	protected boolean hasChanged = false;
-	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored,progress);
+	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, progress);
 
 	public TileEntityXPBottler() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
+		methodRegistry = new PeripheralMethodRegistry(this);
 	}
 
 	public int getSpeed() {
@@ -53,6 +56,9 @@ ITankCallback {
 
 	@Override
 	public void updateEntity() {
+		
+		super.updateEntity();
+		
 		if (!worldObj.isRemote) {
 
 			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);
@@ -71,6 +77,13 @@ ITankCallback {
 		}
 	}
 
+	@Override
+	protected void initialize() {
+		if (worldObj != null) {
+			methodRegistry.setWorld(worldObj);
+		}
+	}
+	
 	public void drainBottles() {
 
 		if (tanks.getTankAmount() + EnchantmentUtils.XP_PER_BOTTLE > tanks.getCapacity() ||
@@ -316,4 +329,38 @@ ITankCallback {
 		return inventory.isStackValidForSlot(i, itemstack);
 	}
 
+
+	
+	/***
+	 * ComputerCraft Interfaces
+	 */
+	
+	public String getType() {
+		return "xpbottler";
+	}
+
+	public String[] getMethodNames() {
+		return methodRegistry.getMethodNames();
+	}
+
+	public Object[] callMethod(dan200.computer.api.IComputerAccess computer, int methodId,
+			Object[] arguments) throws Exception {
+		return methodRegistry.callMethod(computer, methodId, arguments);
+	}
+
+	public boolean canAttachToSide(int side) {
+		return true;
+	}
+
+	public void attach(dan200.computer.api.IComputerAccess computer) {
+	}
+
+	public void detach(dan200.computer.api.IComputerAccess computer) {
+	}
+	
+	@LuaMethod(onTick = true)
+	public int getXPStored(dan200.computer.api.IComputerAccess computer) {
+		return tanks.getTankAmount();
+	}
+	
 }

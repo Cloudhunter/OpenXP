@@ -1,8 +1,8 @@
 package openxp.client;
 
 import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;

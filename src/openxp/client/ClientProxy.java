@@ -5,14 +5,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import openxp.OpenXP;
-import openxp.client.gui.GuiPeripheralEnchantment;
+import openxp.client.gui.GuiAutomatedEnchantment;
 import openxp.client.gui.GuiXPBottler;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
-import openxp.common.tileentity.TileEntityPeripheralEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.TileEntityXPSponge;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
@@ -36,7 +36,7 @@ public class ClientProxy extends CommonProxy {
 		if ((world instanceof WorldClient)) {
 			TileEntity tile = world.getBlockTileEntity(x, y, z);
 			if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
-				  return new GuiPeripheralEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS), (TileEntityPeripheralEnchantmentTable)tile);
+				  return new GuiAutomatedEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS), (TileEntityAutomatedEnchantmentTable)tile);
 			}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
 				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
 			}

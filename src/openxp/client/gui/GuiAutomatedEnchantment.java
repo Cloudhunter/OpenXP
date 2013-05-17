@@ -8,8 +8,8 @@ import org.lwjgl.util.glu.GLU;
 
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
-import openxp.common.tileentity.TileEntityPeripheralEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.client.gui.ScaledResolution;
@@ -26,17 +26,17 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-public class GuiPeripheralEnchantment extends SimpleGui {
+public class GuiAutomatedEnchantment extends SimpleGui {
 	
     
-    private TileEntityPeripheralEnchantmentTable tileentity;
+    private TileEntityAutomatedEnchantmentTable tileentity;
     
-	public GuiPeripheralEnchantment(ContainerGeneric container, TileEntityPeripheralEnchantmentTable tile) {
+	public GuiAutomatedEnchantment(ContainerGeneric container, TileEntityAutomatedEnchantmentTable tile) {
 		super(container, (IHasSimpleGui) tile);
 		this.tileentity = tile;
 		buttons = new SimpleGuiButton[] {
-				new SimpleGuiButton(34, 26, 107, 15, "Lowest Level", TileEntityPeripheralEnchantmentTable.MODE_LOWEST),
-				new SimpleGuiButton(34, 42, 107, 15, "Highest Level", TileEntityPeripheralEnchantmentTable.MODE_HIGHEST)
+				new SimpleGuiButton(34, 26, 107, 15, "Lowest Level", TileEntityAutomatedEnchantmentTable.MODE_LOWEST),
+				new SimpleGuiButton(34, 42, 107, 15, "Highest Level", TileEntityAutomatedEnchantmentTable.MODE_HIGHEST)
 		};
 	}
 	

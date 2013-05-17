@@ -4,17 +4,20 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import openxp.OpenXP;
-import openxp.common.block.BlockPeripheralEnchantmentTable;
+import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.item.ItemLiquidXP;
-import openxp.common.tileentity.TileEntityPeripheralEnchantmentTable;
-import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.util.TickHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,6 +25,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.liquids.LiquidContainerData;
@@ -36,13 +40,16 @@ public class CommonProxy implements IGuiHandler
 	{
 		initBlocks();
 		initItems();
-
+		
+		if (ModLoader.isModLoaded("ComputerCraft")) {
+			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
+		}
 	}
 
 	private void initBlocks()
 	{
 		OpenXP.Blocks.XPSponge = new BlockXPSponge();
-		OpenXP.Blocks.enchantmentTable = new BlockPeripheralEnchantmentTable();
+		OpenXP.Blocks.enchantmentTable = new BlockAutomatedEnchantmentTable();
 		OpenXP.Blocks.XPBottler = new BlockXPBottler();
 	}
 	
@@ -65,7 +72,7 @@ public class CommonProxy implements IGuiHandler
 		TileEntity tile = world.getBlockTileEntity(x, y, z);
 		
 		if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
-			return new ContainerGeneric(player.inventory, tile, TileEntityPeripheralEnchantmentTable.SLOTS);
+			return new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS);
 		}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
 			return new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS);	
 		}

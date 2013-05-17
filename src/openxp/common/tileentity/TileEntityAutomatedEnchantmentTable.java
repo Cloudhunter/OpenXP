@@ -1,25 +1,17 @@
 package openxp.common.tileentity;
 
-import java.util.List;
-
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntityEnchantmentTable;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
-import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
@@ -29,9 +21,10 @@ import openxp.client.core.GuiValueHolder;
 import openxp.client.core.IInventoryCallback;
 import openxp.client.core.ITankCallback;
 import openxp.client.core.SavableInt;
+import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 
-public class TileEntityPeripheralEnchantmentTable extends
+public class TileEntityAutomatedEnchantmentTable extends
 TileEntityEnchantmentTable implements IInventory, IHasSimpleGui,
 ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
@@ -53,7 +46,7 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 	protected boolean hasChanged = false;
 	protected GuiValueHolder guiValues = new GuiValueHolder(mode, levelsAvailable);
 
-	public TileEntityPeripheralEnchantmentTable() {
+	public TileEntityAutomatedEnchantmentTable() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
@@ -226,7 +219,10 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[0];
+		if (side == BlockSide.BOTTOM) {
+			return new int[] { OUTPUT_STACK };
+		}
+		return new int[] { INPUT_STACK };
 	}
 
 	@Override
@@ -298,5 +294,4 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
 		return inventory.isStackValidForSlot(i, itemstack);
 	}
-
 }

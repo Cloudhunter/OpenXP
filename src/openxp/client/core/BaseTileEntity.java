@@ -8,6 +8,21 @@ import net.minecraft.tileentity.TileEntity;
 
 public class BaseTileEntity extends TileEntity {
 	
+	protected boolean initialized = false;
+	
+	@Override
+	public void updateEntity() {
+		super.updateEntity();
+		if (!initialized) {
+			initialize();
+			initialized = true;
+		}
+	}
+	
+	protected void initialize() {
+		
+	}
+	
 	@Override
 	public Packet getDescriptionPacket() {
 		Packet132TileEntityData packet = new Packet132TileEntityData();

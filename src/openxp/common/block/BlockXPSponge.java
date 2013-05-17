@@ -2,8 +2,8 @@ package openxp.common.block;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import openxp.OpenXP;
-import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
+import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
