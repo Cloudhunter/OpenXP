@@ -8,6 +8,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
 import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
+import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
@@ -32,6 +33,7 @@ public class OpenXP
 		public static int spongeBlockID = 500;
 		public static int enchantmentTableID = 501;
 		public static int bottlerID = 502;
+		public static int autoAnvilBlockID = 503;
 		
 		public static int liquidXpItemID = 3000;
 	}
@@ -39,7 +41,8 @@ public class OpenXP
 	public static enum Gui
 	{
 		enchantmentTable,
-		xpBottler
+		xpBottler,
+		autoAnvil
 	}
 	
 	public static class Blocks
@@ -47,6 +50,7 @@ public class OpenXP
 		public static BlockXPSponge XPSponge;
 		public static BlockXPBottler XPBottler;
 		public static BlockAutomatedEnchantmentTable enchantmentTable;
+		public static BlockAutoAnvil autoAnvil;
 	}
 	
 	public static class Items

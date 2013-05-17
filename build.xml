@@ -1,4 +1,4 @@
-<!-- nallar's BuildCraft ant build script edited for OpenCCSensors -->
+<!-- nallar's BuildCraft ant build script edited for OpenXP -->
 <project name="OpenCCSensors" default="main">
 	<property environment="env"/>
 	<!-- Properties -->
@@ -18,7 +18,7 @@
 
 	<property name="mc.version"          value="1.5.2"/>
 	<property name="forge.version"       value="7.8.0.696"/>
-	<property name="mod.version"         value="0.1.5f"/>
+	<property name="mod.version"         value="0.0.3"/>
 	<property name="mod.name"	     value="OpenXP"/>
 	
 	<property name="forge.name"          value="minecraftforge-src-${mc.version}-${forge.version}.zip"/>
@@ -137,7 +137,7 @@
 
 	<!-- Default target to run -->
 	<target name="main" depends="package">
-		<copy todir="../instances/1.5.2_fresh/minecraft/mods">
+		<copy todir="bin/">
 			<fileset dir="${jar.dir}"/>
 		</copy>
 	</target>
