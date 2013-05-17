@@ -12,7 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openxp.OpenXP;
-import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.util.BlockSide;
 import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;

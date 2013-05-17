@@ -13,7 +13,7 @@ import openxp.common.container.ContainerGeneric;
 import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
-import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.util.PeripheralHandler;
 import openxp.common.util.TickHandler;
 import cpw.mods.fml.common.network.IGuiHandler;

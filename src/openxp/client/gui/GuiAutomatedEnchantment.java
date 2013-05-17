@@ -9,7 +9,7 @@ import org.lwjgl.util.glu.GLU;
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
-import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
+import openxp.common.tileentity.TileEntityXPBottler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.client.gui.ScaledResolution;

@@ -13,8 +13,8 @@ import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
-import openxp.common.tileentity.xpbottler.TileEntityXPBottler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 

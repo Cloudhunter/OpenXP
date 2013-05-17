@@ -1,4 +1,4 @@
-package openxp.common.tileentity.xpbottler;
+package openxp.common.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -6,6 +6,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.src.ModLoader;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
@@ -35,7 +36,7 @@ ITankCallback, IIsPeripheral {
 	public static final int INPUT_SLOT = 0;
 	public static final int OUTPUT_SLOT = 1;
 	
-	private PeripheralMethodRegistry methodRegistry = new PeripheralMethodRegistry(this);
+	private PeripheralMethodRegistry methodRegistry = new PeripheralMethodRegistry(this, "xpbottler");
 
 	/**
 	 * These are the slot positions of the GUI. x,y, x,y
@@ -79,7 +80,6 @@ ITankCallback, IIsPeripheral {
 		// (see onTankChanged/onInventoryChanged)
 		inventory.addCallback(this);
 		tanks.addCallback(this);
-		
 	}
 
 	/**

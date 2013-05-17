@@ -6,18 +6,21 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.IHostedPeripheral;
 
 public class PeripheralMethodRegistry implements IHostedPeripheral {
 
-	private World world;
-
 	private ArrayList<IMethodCallback> methods = new ArrayList<IMethodCallback>();
-
-	public PeripheralMethodRegistry(final Object target) {
 	
+	private String type;
+
+	public PeripheralMethodRegistry(final TileEntity target, String type) {
+		
+		this.type = type;
+		
 		Method[] methods = target.getClass().getMethods();
 		
 		for (final Method method : methods) {
@@ -34,7 +37,6 @@ public class PeripheralMethodRegistry implements IHostedPeripheral {
 
 					@Override
 					public Object execute(IComputerAccess item, final Object[] params) throws Exception {
-						
 						final Object[] args = new Object[params.length + 1];
 						System.arraycopy(params, 0, args, 1, params.length);
 						args[0] = item;
@@ -55,7 +57,7 @@ public class PeripheralMethodRegistry implements IHostedPeripheral {
 
 						if (luaMethod.onTick()) {
 							Future callback = TickHandler.addTickCallback(
-									world, new Callable() {
+									target.worldObj, new Callable() {
 										@Override
 										public Object call() throws Exception {
 											return method.invoke(target, args);
@@ -72,10 +74,6 @@ public class PeripheralMethodRegistry implements IHostedPeripheral {
 		}
 	}
 	
-	public void setWorld(World world) {
-		this.world = world;
-	}
-
 	public String[] getMethodNames() {
 		String[] names = new String[methods.size()];
 		int index = 0;
@@ -96,7 +94,7 @@ public class PeripheralMethodRegistry implements IHostedPeripheral {
 
 	@Override
 	public String getType() {
-		return "xpbottler";
+		return type;
 	}
 
 	@Override
