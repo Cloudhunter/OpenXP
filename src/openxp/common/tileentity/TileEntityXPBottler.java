@@ -52,7 +52,13 @@ ITankCallback {
 	/**
 	 * A wrapper around the tank
 	 */
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.XP_PER_BOTTLE * 32));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+				new LiquidTank(
+						EnchantmentUtils.XPToLiquidRatio(
+								EnchantmentUtils.XP_PER_BOTTLE * 32
+						)
+				)
+	);
 	
 	/**
 	 * A wrapper around the inventory
@@ -114,7 +120,7 @@ ITankCallback {
 	public void drainBottles() {
 
 		// validate that everything is OK regarding slots and the tank
-		if (tanks.getTankAmount() + EnchantmentUtils.XP_PER_BOTTLE > tanks.getCapacity() ||
+		if (tanks.getTankAmount() + EnchantmentUtils.LIQUID_PER_XP_BOTTLE > tanks.getCapacity() ||
 				!areSlotsValid(Item.expBottle, Item.glassBottle)) {
 			progress.setValue(0);
 			return;
@@ -126,7 +132,7 @@ ITankCallback {
 		// if the progress is complete, lets fill the tank, fix the slots and reset the progress
 		if (progress.getValue() >= getSpeed()) {
 			switchSlots(Item.glassBottle);
-			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.XP_PER_BOTTLE), true);
+			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.LIQUID_PER_XP_BOTTLE), true);
 			progress.setValue(0);
 		}
 
@@ -138,7 +144,7 @@ ITankCallback {
 	public void fillBottles() {
 
 		// check we have enough fluid in the tank and the slots are correct
-		if (tanks.getTankAmount() < EnchantmentUtils.XP_PER_BOTTLE ||
+		if (tanks.getTankAmount() < EnchantmentUtils.LIQUID_PER_XP_BOTTLE ||
 				!areSlotsValid(Item.glassBottle, Item.expBottle)) {
 
 			progress.setValue(0);
@@ -152,7 +158,7 @@ ITankCallback {
 		// the tank
 		if (progress.getValue() >= getSpeed()) {
 			switchSlots(Item.expBottle);
-			tanks.drain(EnchantmentUtils.XP_PER_BOTTLE, true);
+			tanks.drain(EnchantmentUtils.LIQUID_PER_XP_BOTTLE, true);
 			progress.setValue(0);
 		}
 

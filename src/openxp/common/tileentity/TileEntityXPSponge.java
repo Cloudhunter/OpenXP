@@ -19,12 +19,17 @@ import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(30)));
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(
+							EnchantmentUtils.XPToLiquidRatio(
+									EnchantmentUtils.getExperienceForLevel(30)
+							)
+	));
 	
 	private SavableInt lastFilled = new SavableInt("lastFilled");
 	
 	private AxisAlignedBB suckupBounds;
 	private AxisAlignedBB destroyBounds;
+	private int inventoryRenderAmount =  0;
 	
 	public TileEntityXPSponge() {
 		
@@ -49,6 +54,18 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 					zCoord + 2
 			);
 		}
+	}
+	
+	public void setTankAmount(double percent) {
+		tanks.fill(LiquidDictionary.getLiquid("liquidxp", (int)(percent * tanks.getCapacity())), true);
+	}
+	
+	public void setInventoryRenderAmount(int inventoryRenderAmount) {
+		this.inventoryRenderAmount = inventoryRenderAmount;
+	}
+	
+	public int getInventoryRenderAmount() {
+		return this.inventoryRenderAmount;
 	}
 	
 	@Override
@@ -76,7 +93,9 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 			
 			if (!worldObj.isRemote) {
 				if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
-					tanks.fill(LiquidDictionary.getLiquid("liquidxp", entity.getXpValue()), true);
+					tanks.fill(LiquidDictionary.getLiquid("liquidxp",
+							EnchantmentUtils.XPToLiquidRatio(entity.getXpValue())
+					), true);
 					entity.setDead();
 				}
 			}
@@ -87,7 +106,12 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 			int filled = (int)Math.round(tanks.getPercentFull());
 			if (filled != lastFilled.getValue()) {
 				lastFilled.setValue(filled);
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				int metadata = (int)((double)filled / 10);
+				if (metadata != worldObj.getBlockMetadata(xCoord, yCoord, zCoord)) {
+					worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, metadata, 3);	
+				}else {
+					worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				}
 			}
 		}
 

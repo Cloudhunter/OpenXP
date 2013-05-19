@@ -25,7 +25,9 @@ public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {
 		if (block == OpenXP.Blocks.autoAnvil) {
 			TileEntityRenderer.instance.renderTileEntityAt(new TileEntityAutoAnvil(), 0.0D, 0.0D, 0.0D, 0.0F);
 		}else if (block == OpenXP.Blocks.XPSponge) {
-			TileEntityRenderer.instance.renderTileEntityAt(new TileEntityXPSponge(), 0.0D, 0.0D, 0.0D, 0.0F);
+			TileEntityXPSponge sponge = new TileEntityXPSponge();
+			sponge.setInventoryRenderAmount(metadata);
+			TileEntityRenderer.instance.renderTileEntityAt(sponge, 0.0D, 0.0D, 0.0D, 0.0F);
 		}
 		
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);

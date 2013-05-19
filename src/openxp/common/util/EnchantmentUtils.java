@@ -13,6 +13,8 @@ import net.minecraftforge.common.ForgeHooks;
 public class EnchantmentUtils {
 
 	public static final int XP_PER_BOTTLE = 8;
+	public static final int RATIO = 20;
+	public static final int LIQUID_PER_XP_BOTTLE = XP_PER_BOTTLE * RATIO;
 	
 	public static int getLevelForExperience(int experience) {
 		int i = 0;
@@ -20,6 +22,14 @@ public class EnchantmentUtils {
 			i++;
 		}
 		return i - 1;
+	}
+	
+	public static int XPToLiquidRatio(int xp) {
+		return xp * RATIO;
+	}
+	
+	public static int LiquidToXPRatio(int liquid) {
+		return liquid / RATIO;
 	}
 	
 	public static int getExperienceForLevel(int level) {

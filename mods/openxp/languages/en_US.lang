@@ -1,0 +1,8 @@
+tile.openxp.xpsponge.name=XP Sponge
+tile.openxp.xpbottler.name=XP Bottler
+tile.openxp.enchantmenttable.name=Automated Enchanter
+tile.openxp.autoanvil.name=Automated Anvil
+
+openxp.gui.xpbottler=XP Bottler
+openxp.gui.autoanvil=Automated Anvil
+openxp.gui.autoenchanter=Automated Enchanter

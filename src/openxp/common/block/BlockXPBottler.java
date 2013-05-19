@@ -89,5 +89,10 @@ public class BlockXPBottler extends BlockContainer {
 		ForgeDirection orientation = BlockUtils.get2dOrientation(entityliving.getPosition(1.0F), Vec3.createVectorHelper(i, j, k));
 		world.setBlockMetadataWithNotify(i, j, k, orientation.getOpposite().ordinal(), 3);
 	}
-	
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, par5, par6);
+	}
 }

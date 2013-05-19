@@ -41,7 +41,13 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	protected SavableInt mode = new SavableInt("mode");
 	protected SavableInt levelsAvailable = new SavableInt("levelsAvailable");
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(30)));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+			new LiquidTank(
+					EnchantmentUtils.XPToLiquidRatio(
+							EnchantmentUtils.getExperienceForLevel(30)
+					)
+			)
+	);
 	protected BaseInventory inventory = new BaseInventory("enchantmenttable", true, 2);
 	protected boolean hasChanged = false;
 	protected GuiValueHolder guiValues = new GuiValueHolder(mode, levelsAvailable);
@@ -61,7 +67,8 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 			if (hasChanged) {
 
-				levelsAvailable.setValue(EnchantmentUtils.getLevelForExperience(getExperience()));
+				// set the levels available to the amount of experience stored
+				levelsAvailable.setValue(getXPLevel());
 
 				ItemStack inputStack = inventory.getStackInSlot(INPUT_STACK);
 				ItemStack outputStack = inventory.getStackInSlot(OUTPUT_STACK);
@@ -76,17 +83,22 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 					int enchantability = EnchantmentUtils.calcEnchantability(inputStack, (int)power, getMaxEnchantability);
 
-					int xpRequired = EnchantmentUtils.getExperienceForLevel(enchantability);
+					// the amount of actual liquid XP required
+					int xpRequired = EnchantmentUtils.XPToLiquidRatio(
+							EnchantmentUtils.getExperienceForLevel(enchantability)
+					);
 
-					if (xpRequired >= enchantability) {
+					// if we've got enough liquid
+					if (getExperienceLiquid() >= xpRequired) {
 
+						// drain it
 						tanks.drain(xpRequired, true);
 
 						inventory.setInventorySlotContents(OUTPUT_STACK, inputStack);
 						inventory.setInventorySlotContents(INPUT_STACK, null);
 						EnchantmentUtils.enchantItem(inputStack, enchantability, worldObj.rand);
 
-						levelsAvailable.setValue(EnchantmentUtils.getLevelForExperience(getExperience()));
+						levelsAvailable.setValue(getXPLevel());
 
 					}
 				}
@@ -105,7 +117,15 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 		return mode.getValue();
 	}
 
-	public int getExperience() {
+	public int getXPLevel() {
+		return EnchantmentUtils.getLevelForExperience(getXP());
+	}
+	
+	public int getXP() {
+		return EnchantmentUtils.LiquidToXPRatio(getExperienceLiquid());
+	}
+	
+	public int getExperienceLiquid() {
 		return tanks.getTankAmount();
 	}
 

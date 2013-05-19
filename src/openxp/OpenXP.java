@@ -3,6 +3,7 @@ package openxp;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.Property;
 import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
 import openxp.common.block.BlockAutoAnvil;
@@ -22,14 +23,17 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 public class OpenXP
 {
+	
+	public static String RESOURCE_PATH;
+	public static String LANGUAGE_PATH;
+	
 	public static class Config
 	{
-		public static int spongeBlockID = 500;
-		public static int enchantmentTableID = 501;
-		public static int bottlerID = 502;
-		public static int autoAnvilBlockID = 503;
-		
-		public static int liquidXpItemID = 3000;
+		public static int spongeBlockID;
+		public static int enchantmentTableID;
+		public static int bottlerID;
+		public static int autoAnvilBlockID;
+		public static int liquidXpItemID;
 	}
 	
 	public static enum Gui
@@ -72,20 +76,32 @@ public class OpenXP
 	@Mod.PreInit
 	public void preInit( FMLPreInitializationEvent evt )
 	{
-		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
-/*
-		Property prop = configFile.getBlock("XPLiquidFlowingID", 702);
-		prop.comment = "The block ID for the flowing XP liquid";
-		Config.XPLiquidFlowingID = prop.getInt();
 
-		prop = configFile.getBlock("XPLiquidStillID", 701);
-		prop.comment = "The block ID for the static XP liquid";
-		Config.XPLiquidStillID = prop.getInt();
+		RESOURCE_PATH = "/mods/openxp";
+		LANGUAGE_PATH = String.format("%s/languages", RESOURCE_PATH);
 		
-		prop = configFile.getBlock("itemBucketXPID", 2101);
-		prop.comment = "The item ID for the XP bucket";
-		Config.itemBucketXPID = prop.getInt();
-*/
+		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
+
+		Property prop = configFile.getBlock("spongeBlockID", 500);
+		prop.comment = "The block ID for the sponge block";
+		Config.spongeBlockID = prop.getInt();
+
+		prop = configFile.getBlock("enchantmentTableID", 501);
+		prop.comment = "The block ID for the enchantment table block";
+		Config.enchantmentTableID = prop.getInt();
+		
+		prop = configFile.getBlock("bottlerID", 502);
+		prop.comment = "The block ID for the xp bottler block";
+		Config.bottlerID = prop.getInt();
+		
+		prop = configFile.getBlock("autoAnvilBlockID", 503);
+		prop.comment = "The block ID for the auto anvil block";
+		Config.autoAnvilBlockID = prop.getInt();
+
+		prop = configFile.getItem("liquidXpItemID", 3000);
+		prop.comment = "The item ID for liquid XP";
+		Config.liquidXpItemID = prop.getInt();
+		
 		configFile.save();		
 	}
 

@@ -19,6 +19,7 @@ import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.util.LanguageUtils;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -31,11 +32,16 @@ public class CommonProxy implements IGuiHandler
 	{
 		initBlocks();
 		initItems();
+		setupLanguages();
 		
 		if (ModLoader.isModLoaded("ComputerCraft")) {
 			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
 			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralRegistry());
 		}
+	}
+
+	private void setupLanguages() {
+		LanguageUtils.setupLanguages();
 	}
 
 	private void initBlocks()

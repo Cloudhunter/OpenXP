@@ -22,12 +22,13 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 public class BlockAutoAnvil extends BlockContainer {	
 	public BlockAutoAnvil() {
 		super(OpenXP.Config.autoAnvilBlockID, Material.anvil);
-		setHardness(0.5F);
+		setHardness(5.0F);
+		setStepSound(soundAnvilFootstep);
+		setResistance(2000.0F);
 		setCreativeTab(OpenXP.tabOpenXP);
 		GameRegistry.registerBlock(this, "autoAnvil");
 		GameRegistry.registerTileEntity(TileEntityAutoAnvil.class, "autoAnvil");
-		setUnlocalizedName("openxp.autoAnvil");
-		LanguageRegistry.addName(this, "Automatic Anvil");
+		setUnlocalizedName("openxp.autoanvil");
 	}
 	
 	public TileEntity createNewTileEntity(World world) {
@@ -58,13 +59,18 @@ public class BlockAutoAnvil extends BlockContainer {
 		return OpenXP.renderId;
 	}
 
-	public boolean renderAsNormalBlock()
-	{
+	public boolean renderAsNormalBlock() {
 		return false;
 	}
 
-	public boolean isOpaqueCube()
-	{
+	public boolean isOpaqueCube() {
 		return false;
 	}
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, par5, par6);
+	}
+
 }

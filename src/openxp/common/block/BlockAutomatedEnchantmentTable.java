@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import openxp.OpenXP;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
@@ -19,7 +20,7 @@ public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
 
 		GameRegistry.registerTileEntity(TileEntityAutomatedEnchantmentTable.class, "enchantmentTable");
 
-		setUnlocalizedName("openxp.enchantmentTable");
+		setUnlocalizedName("openxp.enchantmenttable");
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z,
@@ -38,4 +39,9 @@ public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
 		return new TileEntityAutomatedEnchantmentTable();
 	}
 
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, par5, par6);
+	}
 }

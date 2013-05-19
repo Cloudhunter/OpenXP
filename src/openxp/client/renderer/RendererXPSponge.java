@@ -59,9 +59,16 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 			double z, float partialTick) {
 
 		TileEntityXPSponge sponge = (TileEntityXPSponge) tileentity;
+		int inventoryRenderAmount = sponge.getInventoryRenderAmount();
+		
+		double lastFilled = 0;
+		
+		lastFilled = (double)sponge.getLastFilled() / 100.0;
 
-		double lastFilled = (double)sponge.getLastFilled() / 100.0;
-
+		if (inventoryRenderAmount > 0) {
+			lastFilled = (double)inventoryRenderAmount / 10;
+		}
+		
 		double top = 0.05 + (lastFilled * 0.9);
 
 		if (lastFilled > 0.1) {
@@ -77,20 +84,18 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 
 		GL11.glPushMatrix();
 
-		LiquidStack stack = sponge.getLiquidStack();
-		if (stack != null) {
-
+		if (lastFilled > 0.0) {
 			GL11.glDisable(2896);
 			Tessellator t = Tessellator.instance;
 			renderBlocks.setRenderBounds(0.05D, 0.05D, 0.05D, 0.95D, top, 0.95D);
 			t.startDrawingQuads();
-
+	
 			t.setColorOpaque_F(1.0F, 1.0F, 1.0F);
 			t.setBrightness(200);
 			Icon renderingIcon = OpenXP.liquidStack.getRenderingIcon();
-
+	
 			bindTextureByName("/mods/openxp/textures/items/xpjuice.png");
-
+	
 			Block XPSponge = OpenXP.Blocks.XPSponge;
 			renderBlocks.renderFaceXNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
 			renderBlocks.renderFaceXPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
@@ -98,11 +103,11 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 			renderBlocks.renderFaceYPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
 			renderBlocks.renderFaceZNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
 			renderBlocks.renderFaceZPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-
+	
 			t.draw();
-
-			GL11.glEnable(2896);
 		}
+
+		GL11.glEnable(2896);
 
 
 		bindTextureByName("/mods/openxp/textures/blocks/xpsponge.png");

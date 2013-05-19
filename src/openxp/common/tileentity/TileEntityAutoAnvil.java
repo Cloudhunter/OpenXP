@@ -28,6 +28,7 @@ import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
 import openxp.common.core.SavableInt;
+import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 /**
  * The TileEntity object for the Automatic Anvil
@@ -44,7 +45,13 @@ ITankCallback  {
 	public final static int MODIFIER_STACK = 1;
 	public final static int OUTPUT_STACK = 2;
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(39)));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+			new LiquidTank(
+					EnchantmentUtils.XPToLiquidRatio(
+							EnchantmentUtils.getExperienceForLevel(39)
+					)
+			)
+	);
 	protected BaseInventory inventory = new BaseInventory("autoAnvil", true, 3);
 	protected boolean hasChanged = false;
 
@@ -55,14 +62,14 @@ ITankCallback  {
 	private SavableInt percentStored = new SavableInt("percentStored");
 	private SavableInt percentRequired = new SavableInt("percentRequired");
 	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, percentRequired, progress);
-	private int xpRequired = 0;
+	private int liquidRequired = 0;
+	private int stackSizeToBeUsedInRepair;
 	
 	public TileEntityAutoAnvil() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
 	
-	private int stackSizeToBeUsedInRepair;
 
 	public int getRotation() {
 		if (worldObj == null) {
@@ -77,33 +84,27 @@ ITankCallback  {
 		super.updateEntity();
 
 		if (!worldObj.isRemote){
-
 			if (hasChanged) {
-				
-				xpRequired = updateRepairOutput(false);
-				if (xpRequired == 0) {
-					progress.setValue(0);
-				}
-				
-			} else {
-				if (xpRequired > 0 && tanks.getTankAmount() >= xpRequired) {
-					progress.add(1);
-					if (progress.getValue() >= getSpeed()) {
-						xpRequired = updateRepairOutput(true);
-						progress.setValue(0);
-					}
-				}else {
+				liquidRequired = updateRepairOutput(false);	
+			}
+			if (liquidRequired == 0) {
+				progress.setValue(0);
+			}
+			if (liquidRequired > 0 && tanks.getTankAmount() >= liquidRequired) {
+				progress.add(1);
+				if (progress.getValue() >= getSpeed()) {
+					liquidRequired = updateRepairOutput(true);
 					progress.setValue(0);
 				}
 			}
 
 			percentStored.setValue((int) tanks.getPercentFull());
-			percentRequired.setValue((int)(100.0 / tanks.getCapacity() * xpRequired));
+			percentRequired.setValue((int)(100.0 / tanks.getCapacity() * liquidRequired));
 			
 			hasChanged = false;
 		}
-
 	}
+
 
 	public int getSpeed() {
 		return 20;
@@ -344,8 +345,9 @@ ITankCallback  {
                 EnchantmentHelper.setEnchantments(inputStackEnchantments, inputStackCopy);
                 
                 int requiredXP = EnchantmentUtils.getExperienceForLevel(maximumCost);
-                if (tanks.getTankAmount() >= requiredXP && doIt) {
-                	tanks.drain(requiredXP, true);
+                int requiredLiquid = EnchantmentUtils.XPToLiquidRatio(requiredXP);
+                if (tanks.getTankAmount() >= requiredLiquid && doIt) {
+                	tanks.drain(requiredLiquid, true);
 		            inventory.setInventorySlotContents(INPUT_STACK, null);
 		            if (flag) {
 		            	stackSizeToBeUsedInRepair = 1;
@@ -355,7 +357,7 @@ ITankCallback  {
 		            progress.setValue(0);
 		            return 0;
                 }
-                return requiredXP;
+                return requiredLiquid;
             }
         }
         return 0;
@@ -376,10 +378,6 @@ ITankCallback  {
 
 	public double getPercentProgress() {
 		return 100.0 / getSpeed() * getProgress();
-	}
-	
-	public int getExperience() {
-		return tanks.getTankAmount();
 	}
 
 	@Override
@@ -486,11 +484,6 @@ ITankCallback  {
 	}
 
 	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[0];
-	}
-
-	@Override
 	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
 		return isStackValidForSlot(slotID, itemstack);
 	}
@@ -550,6 +543,16 @@ ITankCallback  {
 		inventory.openChest();
 	}
 
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		if (side == BlockSide.TOP) {
+			return new int[] { INPUT_STACK };
+		}else if (side == BlockSide.BOTTOM) {
+			return new int[] { MODIFIER_STACK };
+		}
+		return new int[] { OUTPUT_STACK };
+	}
+	
 	@Override
 	public void closeChest() {
 		inventory.closeChest();
