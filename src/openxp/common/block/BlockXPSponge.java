@@ -21,12 +21,6 @@ public class BlockXPSponge extends BlockContainer {
 	}
 
 	@Override
-	public void registerIcons(IconRegister iconRegister)
-	{
-		blockIcon = iconRegister.registerIcon("openxp:xpsponge");
-	}
-
-	@Override
 	public TileEntity createNewTileEntity(World world) {
 		return new TileEntityXPSponge();
 	}

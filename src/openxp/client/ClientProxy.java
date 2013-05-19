@@ -8,6 +8,7 @@ import openxp.OpenXP;
 import openxp.client.gui.GuiAutoAnvil;
 import openxp.client.gui.GuiAutomatedEnchantment;
 import openxp.client.gui.GuiXPBottler;
+import openxp.client.renderer.RendererAutoAnvil;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
@@ -29,6 +30,11 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(
 				TileEntityXPSponge.class,
 				new RendererXPSponge()
+		);
+		
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityAutoAnvil.class,
+				new RendererAutoAnvil()
 		);
 	}
 

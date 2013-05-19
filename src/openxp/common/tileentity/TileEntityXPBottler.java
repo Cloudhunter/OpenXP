@@ -88,7 +88,7 @@ ITankCallback {
 	public void updateEntity() {
 
 		super.updateEntity();
-
+		
 		if (!worldObj.isRemote) {
 
 			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);

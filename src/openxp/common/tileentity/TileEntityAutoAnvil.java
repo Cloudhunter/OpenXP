@@ -44,7 +44,7 @@ ITankCallback  {
 	public final static int MODIFIER_STACK = 1;
 	public final static int OUTPUT_STACK = 2;
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(39)));
 	protected BaseInventory inventory = new BaseInventory("autoAnvil", true, 3);
 	protected boolean hasChanged = false;
 
@@ -64,6 +64,13 @@ ITankCallback  {
 	
 	private int stackSizeToBeUsedInRepair;
 
+	public int getRotation() {
+		if (worldObj == null) {
+			return 0;
+		}
+		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+	}
+	
 	@Override
 	public void updateEntity() {
 
@@ -78,8 +85,6 @@ ITankCallback  {
 					progress.setValue(0);
 				}
 				
-				percentStored.setValue((int) tanks.getPercentFull());
-				percentRequired.setValue((int)(100.0 / tanks.getCapacity() * xpRequired));
 			} else {
 				if (xpRequired > 0 && tanks.getTankAmount() >= xpRequired) {
 					progress.add(1);
@@ -91,6 +96,9 @@ ITankCallback  {
 					progress.setValue(0);
 				}
 			}
+
+			percentStored.setValue((int) tanks.getPercentFull());
+			percentRequired.setValue((int)(100.0 / tanks.getCapacity() * xpRequired));
 			
 			hasChanged = false;
 		}
@@ -339,8 +347,12 @@ ITankCallback  {
                 if (tanks.getTankAmount() >= requiredXP && doIt) {
                 	tanks.drain(requiredXP, true);
 		            inventory.setInventorySlotContents(INPUT_STACK, null);
-		            inventory.setInventorySlotContents(MODIFIER_STACK, null);
+		            if (flag) {
+		            	stackSizeToBeUsedInRepair = 1;
+		            }
+		            inventory.decrStackSize(MODIFIER_STACK, stackSizeToBeUsedInRepair);
 		            inventory.setInventorySlotContents(OUTPUT_STACK, inputStackCopy);
+		            progress.setValue(0);
 		            return 0;
                 }
                 return requiredXP;

@@ -2,11 +2,16 @@ package openxp.common.block;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 import openxp.OpenXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
+import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 /**
@@ -40,5 +45,26 @@ public class BlockAutoAnvil extends BlockContainer {
 		player.openGui(OpenXP.instance, OpenXP.Gui.autoAnvil.ordinal(), world, x, y, z);
 		return true;
 	}
+	
+	@Override
+	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving, ItemStack itemStack) {
+		super.onBlockPlacedBy(world, i, j, k, entityliving, itemStack);
+		ForgeDirection orientation = BlockUtils.get2dOrientation(entityliving.getPosition(1.0F), Vec3.createVectorHelper(i, j, k));
+		world.setBlockMetadataWithNotify(i, j, k, orientation.getOpposite().ordinal(), 3);
+	}
+	
+	@Override
+	public int getRenderType() {
+		return OpenXP.renderId;
+	}
 
+	public boolean renderAsNormalBlock()
+	{
+		return false;
+	}
+
+	public boolean isOpaqueCube()
+	{
+		return false;
+	}
 }

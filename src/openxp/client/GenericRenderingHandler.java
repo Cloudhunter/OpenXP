@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.world.IBlockAccess;
 import openxp.OpenXP;
+import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityXPSponge;
 
 import org.lwjgl.opengl.GL11;
@@ -20,8 +21,13 @@ public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {
 
 		GL11.glRotatef(-90.0F, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-		TileEntityRenderer.instance.renderTileEntityAt(
-				new TileEntityXPSponge(), 0.0D, 0.0D, 0.0D, 0.0F);
+		
+		if (block == OpenXP.Blocks.autoAnvil) {
+			TileEntityRenderer.instance.renderTileEntityAt(new TileEntityAutoAnvil(), 0.0D, 0.0D, 0.0D, 0.0F);
+		}else if (block == OpenXP.Blocks.XPSponge) {
+			TileEntityRenderer.instance.renderTileEntityAt(new TileEntityXPSponge(), 0.0D, 0.0D, 0.0D, 0.0F);
+		}
+		
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 	}
 

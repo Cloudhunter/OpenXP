@@ -14,24 +14,25 @@ public class EnchantmentUtils {
 
 	public static final int XP_PER_BOTTLE = 8;
 	
-	public static int[] levels = new int[] { 0, 17, 34, 51, 68, 85, 102, 119,
-		136, 153, 170, 187, 204, 221, 238, 255, 272, 292, 315, 341, 370,
-		402, 437, 475, 516, 560, 607, 657, 710, 766, 825, 887, 956, 1032, 1115, 1205,
-		1302, 1406, 1517, 1635, 1760 };
-
-	public static int LEVEL_30 = 825;
-	
 	public static int getLevelForExperience(int experience) {
-		int level = 0;
-		for (int i = 0; i < levels.length; i++) {
-			if (experience >= levels[i])
-				level = i;
+		int i = 0;
+		while (getExperienceForLevel(i) <= experience) {
+			i++;
 		}
-		return level;
+		return i - 1;
 	}
 	
 	public static int getExperienceForLevel(int level) {
-		return levels[level];
+		if (level == 0) {
+			return 0;
+		}
+	    if (level > 0 && level < 16) {
+	        return level * 17;
+	    }else if (level > 15 && level < 31) {
+	        return (int)(1.5 * Math.pow(level, 2) - 29.5 * level + 360);
+	    }else {
+	        return (int)(3.5 * Math.pow(level, 2) - 151.5 * level + 2220);
+	    }
 	}
 	
 	public static double getPower(World worldObj, int xCoord, int yCoord, int zCoord) {

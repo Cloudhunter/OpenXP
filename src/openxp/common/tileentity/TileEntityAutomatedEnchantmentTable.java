@@ -41,7 +41,7 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	protected SavableInt mode = new SavableInt("mode");
 	protected SavableInt levelsAvailable = new SavableInt("levelsAvailable");
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(30)));
 	protected BaseInventory inventory = new BaseInventory("enchantmenttable", true, 2);
 	protected boolean hasChanged = false;
 	protected GuiValueHolder guiValues = new GuiValueHolder(mode, levelsAvailable);

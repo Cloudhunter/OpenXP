@@ -19,7 +19,7 @@ import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.LEVEL_30));
+	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(30)));
 	
 	private SavableInt lastFilled = new SavableInt("lastFilled");
 	
