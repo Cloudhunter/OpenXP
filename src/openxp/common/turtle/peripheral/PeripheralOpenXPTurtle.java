@@ -1,19 +1,7 @@
 package openxp.common.turtle.peripheral;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
-import openxp.OpenXP;
-import openxp.common.ccintegration.BaseTurtlePeripheral;
-import openxp.common.ccintegration.ExposedMethod;
-import openxp.common.ccintegration.LuaMethod;
-import openxp.common.ccintegration.TickHandler;
-import openxp.common.core.BaseTankContainer;
-import openxp.common.util.EnchantmentUtils;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -24,10 +12,14 @@ import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
+import openxp.OpenXP;
+import openxp.common.ccintegration.BaseTurtlePeripheral;
+import openxp.common.ccintegration.LuaMethod;
+import openxp.common.core.BaseTankContainer;
+import openxp.common.util.EnchantmentUtils;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.turtle.api.ITurtleAccess;
-import dan200.turtle.api.ITurtleUpgrade;
 import dan200.turtle.api.TurtleSide;
 
 public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHostedPeripheral {
@@ -93,7 +85,7 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 		return EnchantmentUtils.getLevelForExperience(getXPStored(computer));
 	}
 
-	@LuaMethod(onTick = true)
+	@LuaMethod
 	public int getLiquidVolume(IComputerAccess computer) {
 		return tanks.getTankAmount();
 	}

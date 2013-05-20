@@ -1,14 +1,17 @@
 package openxp.common;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.EnumHelper;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import openxp.OpenXP;
 import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
+import openxp.common.block.BlockHealingStone;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.ccintegration.PeripheralRegistry;
@@ -53,12 +56,16 @@ public class CommonProxy implements IGuiHandler
 		OpenXP.Blocks.enchantmentTable = new BlockAutomatedEnchantmentTable();
 		OpenXP.Blocks.XPBottler = new BlockXPBottler();
 		OpenXP.Blocks.autoAnvil = new BlockAutoAnvil();
+		OpenXP.Blocks.healingStone = new BlockHealingStone();
 	}
 	
 	private void initItems()
 	{
-		OpenXP.Items.liquidXP = new ItemLiquidXP();
+		OpenXP.spectralMaterial = EnumHelper.addToolMaterial("SPECTRAL", 2, 400, 6.0F, 2, 14);
+		OpenXP.spectralMaterial.customCraftingMaterial = Item.expBottle;
 		
+		OpenXP.Items.liquidXP = new ItemLiquidXP();
+	
 		LiquidDictionary.getOrCreateLiquid("liquidxp", new LiquidStack(OpenXP.Items.liquidXP, 1));
 		
 		OpenXP.liquidStack = LiquidDictionary.getCanonicalLiquid("liquidxp");

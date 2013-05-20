@@ -13,7 +13,6 @@ import openxp.OpenXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 /**
  * The Block object for the Automatic Anvil
  * 

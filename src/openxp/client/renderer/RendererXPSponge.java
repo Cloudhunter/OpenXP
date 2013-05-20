@@ -17,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.liquids.LiquidStack;
 import openxp.OpenXP;
 import openxp.client.model.ModelXPSponge;
 import openxp.common.tileentity.TileEntityXPSponge;
@@ -83,7 +82,7 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 		GL11.glTranslatef((float) x + 0.5F, (float) y, (float) z + 0.5F);
 
 		GL11.glPushMatrix();
-
+				
 		if (lastFilled > 0.0) {
 			GL11.glDisable(2896);
 			Tessellator t = Tessellator.instance;

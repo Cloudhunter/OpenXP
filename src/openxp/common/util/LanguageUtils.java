@@ -9,11 +9,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import cpw.mods.fml.common.registry.LanguageRegistry;
-
 import openxp.OpenXP;
 import openxp.common.CommonProxy;
-import openxp.OpenXP;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class LanguageUtils {
 	public static void setupLanguages() {

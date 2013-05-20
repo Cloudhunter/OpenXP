@@ -26,7 +26,7 @@ public class ClientProxy extends CommonProxy {
 		OpenXP.renderId = RenderingRegistry.getNextAvailableRenderId();
 
 		RenderingRegistry.registerBlockHandler(new GenericRenderingHandler());
-
+		
 		ClientRegistry.bindTileEntitySpecialRenderer(
 				TileEntityXPSponge.class,
 				new RendererXPSponge()

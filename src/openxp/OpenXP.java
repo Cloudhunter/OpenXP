@@ -1,6 +1,7 @@
 package openxp;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
@@ -8,6 +9,7 @@ import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
 import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
+import openxp.common.block.BlockHealingStone;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
@@ -33,7 +35,10 @@ public class OpenXP
 		public static int enchantmentTableID;
 		public static int bottlerID;
 		public static int autoAnvilBlockID;
+		public static int healingStoneID;
 		public static int liquidXpItemID;
+		
+		public static int spectraclSwordID = 3001;
 	}
 	
 	public static enum Gui
@@ -49,6 +54,7 @@ public class OpenXP
 		public static BlockXPBottler XPBottler;
 		public static BlockAutomatedEnchantmentTable enchantmentTable;
 		public static BlockAutoAnvil autoAnvil;
+		public static BlockHealingStone healingStone;
 	}
 	
 	public static class Items
@@ -58,6 +64,7 @@ public class OpenXP
 	
 
 	public static LiquidStack liquidStack;
+	public static EnumToolMaterial spectralMaterial;
 	
 	public static int renderId;
 
@@ -97,6 +104,10 @@ public class OpenXP
 		prop = configFile.getBlock("autoAnvilBlockID", 503);
 		prop.comment = "The block ID for the auto anvil block";
 		Config.autoAnvilBlockID = prop.getInt();
+		
+		prop = configFile.getBlock("healingStoneID", 504);
+		prop.comment = "The block ID for the healing stone block";
+		Config.healingStoneID = prop.getInt();
 
 		prop = configFile.getItem("liquidXpItemID", 3000);
 		prop.comment = "The item ID for liquid XP";
