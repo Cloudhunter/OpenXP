@@ -55,6 +55,10 @@ public class BaseTankContainer implements ITankContainer {
 		return getCapacity(0);
 	}
 	
+	public int getFreeSpace() {
+		return getCapacity() - getTankAmount();
+	}
+	
 	public int getCapacity(int i) {
 		return tanks[i].getCapacity();
 	}
