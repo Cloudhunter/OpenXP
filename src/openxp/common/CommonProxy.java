@@ -19,11 +19,13 @@ import openxp.common.item.ItemLiquidXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
 import openxp.common.tileentity.TileEntityXPBottler;
+import openxp.common.turtle.TurtleOpenXP;
 import openxp.common.util.LanguageUtils;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computer.api.ComputerCraftAPI;
+import dan200.turtle.api.TurtleAPI;
 
 public class CommonProxy implements IGuiHandler
 {   
@@ -35,6 +37,7 @@ public class CommonProxy implements IGuiHandler
 		setupLanguages();
 		
 		if (ModLoader.isModLoaded("ComputerCraft")) {
+			TurtleAPI.registerUpgrade(new TurtleOpenXP());
 			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
 			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralRegistry());
 		}

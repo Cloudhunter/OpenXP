@@ -6,3 +6,4 @@ tile.openxp.autoanvil.name=Automated Anvil
 openxp.gui.xpbottler=XP Bottler
 openxp.gui.autoanvil=Automated Anvil
 openxp.gui.autoenchanter=Automated Enchanter
+turtle.openxp.sensor.adjective=OpenXP
