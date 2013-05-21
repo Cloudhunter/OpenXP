@@ -16,8 +16,9 @@ import dan200.turtle.api.TurtleVerb;
 public class TurtleOpenXP implements ITurtleUpgrade {
 
 	@Override
-	public int getUpgradeID() {
-		return 99;
+	public IHostedPeripheral createPeripheral(ITurtleAccess turtle,
+			TurtleSide side) {
+		return new PeripheralOpenXPTurtle(turtle, side);
 	}
 
 	@Override
@@ -31,13 +32,23 @@ public class TurtleOpenXP implements ITurtleUpgrade {
 	}
 
 	@Override
+	public ItemStack getCraftingItem() {
+		return new ItemStack(Item.expBottle);
+	}
+
+	@Override
+	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
+		return OpenXP.Blocks.XPBottler.getIcon(3, 0);
+	}
+
+	@Override
 	public TurtleUpgradeType getType() {
 		return TurtleUpgradeType.Peripheral;
 	}
 
 	@Override
-	public ItemStack getCraftingItem() {
-		return new ItemStack(Item.expBottle);
+	public int getUpgradeID() {
+		return 99;
 	}
 
 	@Override
@@ -46,19 +57,8 @@ public class TurtleOpenXP implements ITurtleUpgrade {
 	}
 
 	@Override
-	public IHostedPeripheral createPeripheral(ITurtleAccess turtle,
-			TurtleSide side) {
-		return new PeripheralOpenXPTurtle(turtle, side);
-	}
-
-	@Override
 	public boolean useTool(ITurtleAccess turtle, TurtleSide side,
 			TurtleVerb verb, int direction) {
 		return false;
-	}
-
-	@Override
-	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
-		return OpenXP.Blocks.XPBottler.getIcon(3, 0);
 	}
 }

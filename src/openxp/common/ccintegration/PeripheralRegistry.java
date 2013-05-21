@@ -13,6 +13,14 @@ public class PeripheralRegistry implements IPeripheralHandler {
 	private static HashMap<Class, ArrayList<ExposedMethod>> peripherals = new HashMap<Class, ArrayList<ExposedMethod>>();
 	private static HashMap<Class, String> names = new HashMap<Class, String>();
 	
+	public static ArrayList<ExposedMethod> getLuaMethods(Class <? extends TileEntity> clazz) {
+		return peripherals.get(clazz);
+	}
+	
+	public static String getName(Class klazz) {
+		return names.get(klazz);
+	}
+	
 	public static void registerTileEntity(Class <? extends TileEntity> clazz, String name) {
 			
 			Method[] methods = clazz.getMethods();
@@ -26,14 +34,6 @@ public class PeripheralRegistry implements IPeripheralHandler {
 			}
 			names.put(clazz, name);
 			peripherals.put(clazz, exposedMethods);
-	}
-	
-	public static String getName(Class klazz) {
-		return names.get(klazz);
-	}
-	
-	public static ArrayList<ExposedMethod> getLuaMethods(Class <? extends TileEntity> clazz) {
-		return peripherals.get(clazz);
 	}
 
 	@Override

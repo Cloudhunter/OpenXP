@@ -14,7 +14,7 @@ import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import openxp.common.core.BaseTankContainer;
 import openxp.common.core.BaseTileEntity;
-import openxp.common.core.SavableInt;
+import openxp.common.core.SyncableInt;
 import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
@@ -25,7 +25,7 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 							)
 	));
 	
-	private SavableInt lastFilled = new SavableInt("lastFilled");
+	private SyncableInt lastFilled = new SyncableInt("lastFilled");
 	
 	private AxisAlignedBB suckupBounds;
 	private AxisAlignedBB destroyBounds;
@@ -56,18 +56,70 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 		}
 	}
 	
-	public void setTankAmount(double percent) {
-		tanks.fill(LiquidDictionary.getLiquid("liquidxp", (int)(percent * tanks.getCapacity())), true);
+	@Override
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return tanks.drain(from, maxDrain, doDrain);
 	}
 	
-	public void setInventoryRenderAmount(int inventoryRenderAmount) {
-		this.inventoryRenderAmount = inventoryRenderAmount;
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		return tanks.drain(tankIndex, maxDrain, doDrain);
+	}
+	
+	@Override
+	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+		return 0;
+	}
+	
+	@Override
+	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
+		return 0;
 	}
 	
 	public int getInventoryRenderAmount() {
 		return this.inventoryRenderAmount;
 	}
 	
+	public int getLastFilled() {
+		return lastFilled.getValue();
+	}
+	
+	
+	public LiquidStack getLiquidStack() {
+		return tanks.getLiquid();
+	}
+	
+	@Override
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks.getTank(direction, type);
+	}
+	
+	@Override
+	public ILiquidTank[] getTanks(ForgeDirection direction) {
+		return tanks.getTanks(direction);
+	}
+	
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		tanks.readFromNBT(tag);
+		lastFilled.readFromNBT(tag);
+	}
+	
+
+	@Override
+	public void readFromNetwork(NBTTagCompound tag) {
+		lastFilled.readFromNBT(tag);
+	}
+
+	public void setInventoryRenderAmount(int inventoryRenderAmount) {
+		this.inventoryRenderAmount = inventoryRenderAmount;
+	}
+
+	public void setTankAmount(double percent) {
+		tanks.fill(LiquidDictionary.getLiquid("liquidxp", (int)(percent * tanks.getCapacity())), true);
+	}
+
 	@Override
 	public void updateEntity() {
 
@@ -116,22 +168,7 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 		}
 
 	}
-	
-	public LiquidStack getLiquidStack() {
-		return tanks.getLiquid();
-	}
-	
-	public int getLastFilled() {
-		return lastFilled.getValue();
-	}
-	
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		tanks.readFromNBT(tag);
-		lastFilled.readFromNBT(tag);
-	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
@@ -140,33 +177,8 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 	}
 
 	@Override
-	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return 0;
-	}
-
-	@Override
-	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return 0;
-	}
-
-	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tanks.drain(from, maxDrain, doDrain);
-	}
-
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tanks.drain(tankIndex, maxDrain, doDrain);
-	}
-
-	@Override
-	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return tanks.getTanks(direction);
-	}
-
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks.getTank(direction, type);
+	public void writeToNetwork(NBTTagCompound tag) {
+		lastFilled.writeToNBT(tag);
 	}
 	
 }

@@ -10,17 +10,8 @@ public class BaseTileEntity extends TileEntity {
 	
 	protected boolean initialized = false;
 	
-	@Override
-	public void updateEntity() {
-		super.updateEntity();
-		if (!initialized) {
-			initialize();
-			initialized = true;
-		}
-	}
-	
-	protected void initialize() {
-		
+	public void addBlockEvent(int eventId, int eventParam) {
+		worldObj.addBlockEvent(xCoord, yCoord, zCoord, getBlockType().blockID, eventId, eventParam);
 	}
 	
 	@Override
@@ -31,14 +22,41 @@ public class BaseTileEntity extends TileEntity {
 		packet.yPosition = yCoord;
 		packet.zPosition = zCoord;
 		NBTTagCompound nbt = new NBTTagCompound();
-		writeToNBT(nbt);
+		writeToNetwork(nbt);
 		packet.customParam1 = nbt;
 		return packet;
+	}
+	
+	protected void initialize() {
+		
+	}
+	
+	public void markForUpdate() {
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+	}
+	
+	public void onBlockEventReceived(int eventId, int eventParam) {
+		
 	}
 
 	@Override
 	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) {
-		readFromNBT(pkt.customParam1);
+		readFromNetwork(pkt.customParam1);
 	}
-
+	
+	public void readFromNetwork(NBTTagCompound tag) {
+	}
+	
+	@Override
+	public void updateEntity() {
+		super.updateEntity();
+		if (!initialized) {
+			initialize();
+			initialized = true;
+		}
+	}
+	
+	public void writeToNetwork(NBTTagCompound tag) {
+	}
+	
 }

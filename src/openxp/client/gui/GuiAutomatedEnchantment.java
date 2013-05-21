@@ -39,6 +39,11 @@ public class GuiAutomatedEnchantment extends SimpleGui {
     }
 	
 	
+	@Override
+	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
+		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.autoenchanter");
+	}
+
 	private void drawPanel(SimpleGuiButton button, int mouseX, int mouseY) {
 		boolean selected = tileentity.getMode() == button.index;
 		int left = (width - xSize) / 2;
@@ -51,10 +56,5 @@ public class GuiAutomatedEnchantment extends SimpleGui {
         	top += 1;
         }
         this.mc.fontRenderer.drawStringWithShadow(button.text, left + button.x + ((107 - this.mc.fontRenderer.getStringWidth(button.text))/2), top + button.y + 4, 8453920);
-	}
-
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
-		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.autoenchanter");
 	}
 }

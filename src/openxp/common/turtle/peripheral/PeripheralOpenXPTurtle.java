@@ -36,123 +36,13 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 	}
 
 	@Override
-	public String getType() {
-		return "openxpturtle";
-	}
-
-	@Override
-	public String[] getMethodNames() {
-		return methodNames;
-	}
-
-	@Override
-	public boolean canAttachToSide(int side) {
-		return true;
-	}
-
-	@Override
 	public void attach(IComputerAccess computer) {
 
 	}
 
 	@Override
-	public void detach(IComputerAccess computer) {
-
-	}
-
-	@Override
-	public void update() {
-
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		tanks.readFromNBT(tag);
-	}
-
-	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		tanks.writeToNBT(tag);
-	}
-
-	@LuaMethod
-	public int getXPStored(IComputerAccess computer) {
-		return EnchantmentUtils.LiquidToXPRatio(tanks.getTankAmount());
-	}
-
-	@LuaMethod
-	public int getLevelsStored(IComputerAccess computer) {
-		return EnchantmentUtils.getLevelForExperience(getXPStored(computer));
-	}
-
-	@LuaMethod
-	public int getLiquidVolume(IComputerAccess computer) {
-		return tanks.getTankAmount();
-	}
-
-	@LuaMethod
-	public int getLiquidCapacity(IComputerAccess computer) {
-		return tanks.getCapacity();
-	}
-
-	@LuaMethod(onTick = true)
-	public int dropUp(IComputerAccess computer, Double amount) {
-		return dropIntoTank(0, amount, ForgeDirection.UP);
-	}
-
-	@LuaMethod(onTick = true)
-	public int dropDown(IComputerAccess computer, Double amount) {
-		return dropIntoTank(0, amount, ForgeDirection.DOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int drop(IComputerAccess computer, Double amount) {
-		return dropIntoTank(0, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int dropBack(IComputerAccess computer, Double amount) {
-		return dropIntoTank(2, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int dropLeft(IComputerAccess computer, Double amount) {
-		return dropIntoTank(3, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int dropRight(IComputerAccess computer, Double amount) {
-		return dropIntoTank(1, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suck(IComputerAccess computer, Double amount) {
-		return suckFromTank(0, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suckDown(IComputerAccess computer, Double amount) {
-		return suckFromTank(0, amount, ForgeDirection.DOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suckUp(IComputerAccess computer, Double amount) {
-		return suckFromTank(0, amount, ForgeDirection.UP);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suckBack(IComputerAccess computer, Double amount) {
-		return suckFromTank(2, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suckLeft(IComputerAccess computer, Double amount) {
-		return suckFromTank(3, amount, ForgeDirection.UNKNOWN);
-	}
-
-	@LuaMethod(onTick = true)
-	public int suckRight(IComputerAccess computer, Double amount) {
-		return suckFromTank(1, amount, ForgeDirection.UNKNOWN);
+	public boolean canAttachToSide(int side) {
+		return true;
 	}
 
 	@LuaMethod(onTick = true)
@@ -177,6 +67,29 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 		return xpCollected;
 	}
 
+	private LiquidStack createLiquid(int amount) {
+		return LiquidDictionary.getLiquid("liquidxp", amount);
+	}
+
+	@Override
+	public void detach(IComputerAccess computer) {
+
+	}
+
+	@LuaMethod(onTick = true)
+	public int drop(IComputerAccess computer, Double amount) {
+		return dropIntoTank(0, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int dropBack(IComputerAccess computer, Double amount) {
+		return dropIntoTank(2, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int dropDown(IComputerAccess computer, Double amount) {
+		return dropIntoTank(0, amount, ForgeDirection.DOWN);
+	}
 
 	private int dropIntoTank(int rotation, Double dAmount, ForgeDirection facingDirection) {
 
@@ -193,6 +106,87 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 			return amountFilled;
 		}
 		return 0;
+	}
+
+	@LuaMethod(onTick = true)
+	public int dropLeft(IComputerAccess computer, Double amount) {
+		return dropIntoTank(3, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int dropRight(IComputerAccess computer, Double amount) {
+		return dropIntoTank(1, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int dropUp(IComputerAccess computer, Double amount) {
+		return dropIntoTank(0, amount, ForgeDirection.UP);
+	}
+
+	@LuaMethod
+	public int getLevelsStored(IComputerAccess computer) {
+		return EnchantmentUtils.getLevelForExperience(getXPStored(computer));
+	}
+
+	@LuaMethod
+	public int getLiquidCapacity(IComputerAccess computer) {
+		return tanks.getCapacity();
+	}
+
+	@LuaMethod
+	public int getLiquidVolume(IComputerAccess computer) {
+		return tanks.getTankAmount();
+	}
+
+	@Override
+	public String[] getMethodNames() {
+		return methodNames;
+	}
+
+	private TileEntity getTileEntity(int rotation, ForgeDirection facingDirection) {
+		if (facingDirection == ForgeDirection.UNKNOWN) {
+			facingDirection = ForgeDirection.getOrientation(turtle.getFacingDir());
+			for (int i = 0; i < rotation; i++) {
+				facingDirection = facingDirection.getRotation(ForgeDirection.UP);
+			}
+		}
+
+		Vec3 position = turtle.getPosition();
+
+		return turtle.getWorld().getBlockTileEntity(
+				(int)position.xCoord + facingDirection.offsetX,
+				(int)position.yCoord + facingDirection.offsetY,
+				(int)position.zCoord + facingDirection.offsetZ);
+	}
+
+	@Override
+	public String getType() {
+		return "openxpturtle";
+	}
+
+	@LuaMethod
+	public int getXPStored(IComputerAccess computer) {
+		return EnchantmentUtils.LiquidToXPRatio(tanks.getTankAmount());
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		tanks.readFromNBT(tag);
+	}
+
+	@LuaMethod(onTick = true)
+	public int suck(IComputerAccess computer, Double amount) {
+		return suckFromTank(0, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int suckBack(IComputerAccess computer, Double amount) {
+		return suckFromTank(2, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int suckDown(IComputerAccess computer, Double amount) {
+		return suckFromTank(0, amount, ForgeDirection.DOWN);
 	}
 
 	private int suckFromTank(int rotation, Double dAmount, ForgeDirection facingDirection) {
@@ -216,23 +210,29 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 		return 0;
 	}
 
-	private TileEntity getTileEntity(int rotation, ForgeDirection facingDirection) {
-		if (facingDirection == ForgeDirection.UNKNOWN) {
-			facingDirection = ForgeDirection.getOrientation(turtle.getFacingDir());
-			for (int i = 0; i < rotation; i++) {
-				facingDirection = facingDirection.getRotation(ForgeDirection.UP);
-			}
-		}
+	@LuaMethod(onTick = true)
+	public int suckLeft(IComputerAccess computer, Double amount) {
+		return suckFromTank(3, amount, ForgeDirection.UNKNOWN);
+	}
 
-		Vec3 position = turtle.getPosition();
 
-		return turtle.getWorld().getBlockTileEntity(
-				(int)position.xCoord + facingDirection.offsetX,
-				(int)position.yCoord + facingDirection.offsetY,
-				(int)position.zCoord + facingDirection.offsetZ);
+	@LuaMethod(onTick = true)
+	public int suckRight(IComputerAccess computer, Double amount) {
+		return suckFromTank(1, amount, ForgeDirection.UNKNOWN);
+	}
+
+	@LuaMethod(onTick = true)
+	public int suckUp(IComputerAccess computer, Double amount) {
+		return suckFromTank(0, amount, ForgeDirection.UP);
+	}
+
+	@Override
+	public void update() {
+
 	}
 	
-	private LiquidStack createLiquid(int amount) {
-		return LiquidDictionary.getLiquid("liquidxp", amount);
+	@Override
+	public void writeToNBT(NBTTagCompound tag) {
+		tanks.writeToNBT(tag);
 	}
 }

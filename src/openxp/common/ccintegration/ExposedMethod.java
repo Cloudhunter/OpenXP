@@ -22,19 +22,19 @@ public class ExposedMethod {
 		onTick = luaMethod.onTick();
 	}
 	
-	public boolean onTick() {
-		return onTick;
+	public Method getMethod() {
+		return javaMethod;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Method getMethod() {
-		return javaMethod;
-	}
-	
 	public Class[] getRequiredParameters() {
 		return requiredParameters;
+	}
+	
+	public boolean onTick() {
+		return onTick;
 	}
 }

@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LuaMethod {
-    boolean onTick() default false;
     String name() default "[unassigned]";
+    boolean onTick() default false;
 }

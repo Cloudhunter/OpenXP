@@ -20,7 +20,7 @@ import openxp.common.core.BaseTileEntity;
 import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
-import openxp.common.core.SavableInt;
+import openxp.common.core.SyncableInt;
 import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
@@ -42,12 +42,12 @@ ITankCallback {
 	/**
 	 * The progress bar in the GUI
 	 */
-	protected SavableInt progress = new SavableInt("progress");
+	protected SyncableInt progress = new SyncableInt("progress");
 	
 	/**
 	 * The percentage of liquid stored
 	 */
-	protected SavableInt percentStored = new SavableInt("percentStored");
+	protected SyncableInt percentStored = new SyncableInt("percentStored");
 	
 	/**
 	 * A wrapper around the tank
@@ -83,34 +83,54 @@ ITankCallback {
 		tanks.addCallback(this);
 	}
 
-	/**
-	 * The time it takes to empty/fill a bottle
-	 */
-	public int getSpeed() {
-		return 20;
+	private boolean areSlotsValid(Item inputItem, Item outputItem) {
+
+		ItemStack inputStack = inventory.getStackInSlot(INPUT_SLOT);
+		ItemStack outputStack = inventory.getStackInSlot(OUTPUT_SLOT);
+
+		if (!inventory.isItem(INPUT_SLOT, inputItem)) {
+			return false;
+		}
+
+		return (
+				outputStack == null ||
+				(outputStack.getItem() == outputItem && outputStack.stackSize < outputStack.getMaxStackSize())
+				);
+
 	}
 
 	@Override
-	public void updateEntity() {
+	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
+		return slotID == OUTPUT_SLOT;
+	}
 
-		super.updateEntity();
-		
-		if (!worldObj.isRemote) {
+	@Override
+	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
+		return isStackValidForSlot(slotID, itemstack);
+	}
 
-			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);
+	@Override
+	public void closeChest() {
+		inventory.closeChest();
+	}
 
-			if (inventory.isItem(INPUT_SLOT, Item.expBottle)) {
-				drainBottles();
-			} else if (inventory.isItem(INPUT_SLOT, Item.glassBottle)) {
-				fillBottles();
-			}
+	@Override
+	public ItemStack decrStackSize(int stackIndex, int byAmount) {
+		return inventory.decrStackSize(stackIndex, byAmount);
+	}
+	
+	@Override
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return tanks.drain(from, maxDrain, doDrain);
+	}
 
-			if (hasChanged) {
-				percentStored.setValue((int) tanks.getPercentFull());
-			}
-
-			hasChanged = false;
-		}
+	/*
+	 * Property getters and setters
+	 */
+	
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		return tanks.drain(tankIndex, maxDrain, doDrain);
 	}
 
 	/**
@@ -138,6 +158,20 @@ ITankCallback {
 
 	}
 
+	@Override
+	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+		return tanks.fill(from, resource, doFill);
+	}
+
+	@Override
+	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
+		return tanks.fill(tankIndex, resource, doFill);
+	}
+	
+	/*
+	 * Methods exposed to ComputerCraft Lua
+	 */
+
 	/**
 	 * Fill empty bottles
 	 */
@@ -164,22 +198,147 @@ ITankCallback {
 
 	}
 
-	private boolean areSlotsValid(Item inputItem, Item outputItem) {
-
-		ItemStack inputStack = inventory.getStackInSlot(INPUT_SLOT);
-		ItemStack outputStack = inventory.getStackInSlot(OUTPUT_SLOT);
-
-		if (!inventory.isItem(INPUT_SLOT, inputItem)) {
-			return false;
-		}
-
-		return (
-				outputStack == null ||
-				(outputStack.getItem() == outputItem && outputStack.stackSize < outputStack.getMaxStackSize())
-				);
-
-	}
+	/*
+	 * Reading and saving from disk
+	 */
 	
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		return new int[0];
+	}
+
+	@Override
+	public int getGuiValue(int index) {
+		return guiValues.get(index).getValue();
+	}
+
+	@Override
+	public int[] getGuiValues() {
+		return guiValues.asIntArray();
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return inventory.getInventoryStackLimit();
+	}
+
+	@Override
+	public String getInvName() {
+		return inventory.getInvName();
+	}
+
+	public double getPercentProgress() {
+		return 100.0 / getSpeed() * getProgress();
+	}
+
+	public int getPercentStored() {
+		return percentStored.getValue();
+	}
+
+	public int getProgress() {
+		return progress.getValue();
+	}
+
+	@Override
+	public int getSizeInventory() {
+		return inventory.getSizeInventory();
+	}
+
+	/**
+	 * The time it takes to empty/fill a bottle
+	 */
+	public int getSpeed() {
+		return 20;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int i) {
+		return inventory.getStackInSlot(i);
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(int i) {
+		return inventory.getStackInSlotOnClosing(i);
+	}
+
+	@Override
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks.getTank(direction, type);
+	}
+
+	@Override
+	public ILiquidTank[] getTanks(ForgeDirection direction) {
+		return tanks.getTanks(direction);
+	}
+
+	@LuaMethod(onTick = true)
+	public int getXPStored(dan200.computer.api.IComputerAccess computer) {
+		return tanks.getTankAmount();
+	}
+
+	@Override
+	public boolean isInvNameLocalized() {
+		return inventory.isInvNameLocalized();
+	}
+
+	@Override
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		return inventory.isStackValidForSlot(i, itemstack);
+	}
+
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+		return inventory.isUseableByPlayer(entityplayer);
+	}
+
+	@Override
+	public void onClientButtonClicked(int button) {
+	}
+
+	@Override
+	public void onInventoryChanged(BaseInventory inventory) {
+		hasChanged = true;
+		progress.setValue(0);
+	}
+
+	@Override
+	public void onServerButtonClicked(EntityPlayer player, int button) {
+		hasChanged = true;
+	}
+
+	@Override
+	public void onTankChanged(BaseTankContainer tankContainer, int index) {
+		hasChanged = true;
+	}
+
+	@Override
+	public void openChest() {
+		inventory.openChest();
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		inventory.readFromNBT(tag);
+		tanks.readFromNBT(tag);
+		percentStored.readFromNBT(tag);
+		progress.readFromNBT(tag);
+	}
+
+	@Override
+	public void setGuiValue(int i, int value) {
+		guiValues.get(i).setValue(value);
+	}
+
+	@Override
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		inventory.setInventorySlotContents(i, itemstack);
+	}
+
+	public void setPercentStored(int value) {
+		percentStored.setValue(value);
+	}
+
 	/**
 	 * Decreases the size of the input slot and increases the size of the
 	 * 
@@ -204,46 +363,27 @@ ITankCallback {
 		return false;
 	}
 
-	/*
-	 * Property getters and setters
-	 */
-	
-	public double getPercentProgress() {
-		return 100.0 / getSpeed() * getProgress();
-	}
-
-	public int getProgress() {
-		return progress.getValue();
-	}
-
-	public int getPercentStored() {
-		return percentStored.getValue();
-	}
-
-	public void setPercentStored(int value) {
-		percentStored.setValue(value);
-	}
-	
-	/*
-	 * Methods exposed to ComputerCraft Lua
-	 */
-
-	@LuaMethod(onTick = true)
-	public int getXPStored(dan200.computer.api.IComputerAccess computer) {
-		return tanks.getTankAmount();
-	}
-
-	/*
-	 * Reading and saving from disk
-	 */
-	
 	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		inventory.readFromNBT(tag);
-		tanks.readFromNBT(tag);
-		percentStored.readFromNBT(tag);
-		progress.readFromNBT(tag);
+	public void updateEntity() {
+
+		super.updateEntity();
+		
+		if (!worldObj.isRemote) {
+
+			ItemStack stack = inventory.getStackInSlot(INPUT_SLOT);
+
+			if (inventory.isItem(INPUT_SLOT, Item.expBottle)) {
+				drainBottles();
+			} else if (inventory.isItem(INPUT_SLOT, Item.glassBottle)) {
+				fillBottles();
+			}
+
+			if (hasChanged) {
+				percentStored.setValue((int) tanks.getPercentFull());
+			}
+
+			hasChanged = false;
+		}
 	}
 
 	@Override
@@ -253,146 +393,6 @@ ITankCallback {
 		tanks.writeToNBT(tag);
 		percentStored.writeToNBT(tag);
 		progress.writeToNBT(tag);
-	}
-
-	@Override
-	public void onInventoryChanged(BaseInventory inventory) {
-		hasChanged = true;
-		progress.setValue(0);
-	}
-
-	@Override
-	public void onTankChanged(BaseTankContainer tankContainer, int index) {
-		hasChanged = true;
-	}
-
-	@Override
-	public void onServerButtonClicked(EntityPlayer player, int button) {
-		hasChanged = true;
-	}
-
-	@Override
-	public void onClientButtonClicked(int button) {
-	}
-
-	@Override
-	public int[] getGuiValues() {
-		return guiValues.asIntArray();
-	}
-
-	@Override
-	public int getGuiValue(int index) {
-		return guiValues.get(index).getValue();
-	}
-
-	@Override
-	public void setGuiValue(int i, int value) {
-		guiValues.get(i).setValue(value);
-	}
-
-	@Override
-	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return tanks.fill(from, resource, doFill);
-	}
-
-	@Override
-	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return tanks.fill(tankIndex, resource, doFill);
-	}
-
-	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tanks.drain(from, maxDrain, doDrain);
-	}
-
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tanks.drain(tankIndex, maxDrain, doDrain);
-	}
-
-	@Override
-	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return tanks.getTanks(direction);
-	}
-
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks.getTank(direction, type);
-	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[0];
-	}
-
-	@Override
-	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
-		return isStackValidForSlot(slotID, itemstack);
-	}
-
-	@Override
-	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
-		return slotID == OUTPUT_SLOT;
-	}
-
-	@Override
-	public int getSizeInventory() {
-		return inventory.getSizeInventory();
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int i) {
-		return inventory.getStackInSlot(i);
-	}
-
-	@Override
-	public ItemStack decrStackSize(int stackIndex, int byAmount) {
-		return inventory.decrStackSize(stackIndex, byAmount);
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int i) {
-		return inventory.getStackInSlotOnClosing(i);
-	}
-
-	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		inventory.setInventorySlotContents(i, itemstack);
-	}
-
-	@Override
-	public String getInvName() {
-		return inventory.getInvName();
-	}
-
-	@Override
-	public boolean isInvNameLocalized() {
-		return inventory.isInvNameLocalized();
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return inventory.getInventoryStackLimit();
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return inventory.isUseableByPlayer(entityplayer);
-	}
-
-	@Override
-	public void openChest() {
-		inventory.openChest();
-	}
-
-	@Override
-	public void closeChest() {
-		inventory.closeChest();
-	}
-
-	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
-		return inventory.isStackValidForSlot(i, itemstack);
 	}
 
 

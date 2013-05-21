@@ -41,12 +41,9 @@ public class BlockXPBottler extends BlockContainer {
 	}
 
 	@Override
-	public void registerIcons(IconRegister iconRegister) {
-		icons.bottom = iconRegister.registerIcon("openxp:xpbottler_bottom");
-		icons.top = iconRegister.registerIcon("openxp:xpbottler_top");
-		icons.sides = iconRegister.registerIcon("openxp:xpbottler_sides");
-		icons.front = iconRegister.registerIcon("openxp:xpbottler_front");
-		icons.back = iconRegister.registerIcon("openxp:xpbottler_back");
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, par5, par6);
 	}
 
 	@Override
@@ -54,19 +51,7 @@ public class BlockXPBottler extends BlockContainer {
 		return new TileEntityXPBottler();
 	}
 	
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z,
-			EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-
-	    TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-		if (player.isSneaking() || tileEntity == null) {
-			return false;
-		}
-		player.openGui(OpenXP.instance, OpenXP.Gui.xpBottler.ordinal(), world, x, y, z);
-		return true;
-	}
-	
-    @SideOnly(Side.CLIENT)
+	@SideOnly(Side.CLIENT)
     @Override
     public Icon getIcon(int i, int j) {
     	if (j == 0 && i == 3)
@@ -82,6 +67,18 @@ public class BlockXPBottler extends BlockContainer {
 		else
 			return icons.sides;
     }
+	
+    @Override
+	public boolean onBlockActivated(World world, int x, int y, int z,
+			EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+
+	    TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+		if (player.isSneaking() || tileEntity == null) {
+			return false;
+		}
+		player.openGui(OpenXP.instance, OpenXP.Gui.xpBottler.ordinal(), world, x, y, z);
+		return true;
+	}
     
 	@Override
 	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving, ItemStack itemStack) {
@@ -91,8 +88,11 @@ public class BlockXPBottler extends BlockContainer {
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
-		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
-		super.breakBlock(world, x, y, z, par5, par6);
+	public void registerIcons(IconRegister iconRegister) {
+		icons.bottom = iconRegister.registerIcon("openxp:xpbottler_bottom");
+		icons.top = iconRegister.registerIcon("openxp:xpbottler_top");
+		icons.sides = iconRegister.registerIcon("openxp:xpbottler_sides");
+		icons.front = iconRegister.registerIcon("openxp:xpbottler_front");
+		icons.back = iconRegister.registerIcon("openxp:xpbottler_back");
 	}
 }

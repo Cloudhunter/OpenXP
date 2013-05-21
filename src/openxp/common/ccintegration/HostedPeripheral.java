@@ -27,13 +27,7 @@ public class HostedPeripheral implements IHostedPeripheral {
 	}
 	
 	@Override
-	public String getType() {
-		return PeripheralRegistry.getName(tile.getClass());
-	}
-
-	@Override
-	public String[] getMethodNames() {
-		return methodNames;
+	public void attach(IComputerAccess computer) {
 	}
 
 	@Override
@@ -81,19 +75,25 @@ public class HostedPeripheral implements IHostedPeripheral {
 	}
 
 	@Override
-	public void attach(IComputerAccess computer) {
-	}
-
-	@Override
 	public void detach(IComputerAccess computer) {
 	}
 
 	@Override
-	public void update() {
+	public String[] getMethodNames() {
+		return methodNames;
+	}
+
+	@Override
+	public String getType() {
+		return PeripheralRegistry.getName(tile.getClass());
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
+	}
+
+	@Override
+	public void update() {
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import net.minecraftforge.liquids.LiquidStack;
 import openxp.common.CommonProxy;
 import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
-import openxp.common.block.BlockHealingStone;
+import openxp.common.block.BlockLifeStone;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
@@ -26,16 +26,21 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 public class OpenXP
 {
 	
-	public static String RESOURCE_PATH;
-	public static String LANGUAGE_PATH;
-	
+	public static class Blocks
+	{
+		public static BlockXPSponge XPSponge;
+		public static BlockXPBottler XPBottler;
+		public static BlockAutomatedEnchantmentTable enchantmentTable;
+		public static BlockAutoAnvil autoAnvil;
+		public static BlockLifeStone lifeStone;
+	}
 	public static class Config
 	{
 		public static int spongeBlockID;
 		public static int enchantmentTableID;
 		public static int bottlerID;
 		public static int autoAnvilBlockID;
-		public static int healingStoneID;
+		public static int lifeStoneID;
 		public static int liquidXpItemID;
 		
 		public static int spectraclSwordID = 3001;
@@ -48,19 +53,14 @@ public class OpenXP
 		autoAnvil
 	}
 	
-	public static class Blocks
-	{
-		public static BlockXPSponge XPSponge;
-		public static BlockXPBottler XPBottler;
-		public static BlockAutomatedEnchantmentTable enchantmentTable;
-		public static BlockAutoAnvil autoAnvil;
-		public static BlockHealingStone healingStone;
-	}
-	
 	public static class Items
 	{
 		public static ItemLiquidXP liquidXP;
 	}
+	
+	public static String RESOURCE_PATH;
+	
+	public static String LANGUAGE_PATH;
 	
 
 	public static LiquidStack liquidStack;
@@ -79,6 +79,16 @@ public class OpenXP
 
 	@SidedProxy( clientSide = "openxp.client.ClientProxy", serverSide = "openxp.common.CommonProxy" )
 	public static CommonProxy proxy;
+
+	@Mod.Init
+	public void init( FMLInitializationEvent evt )
+	{
+		proxy.init();
+		NetworkRegistry.instance().registerGuiHandler(OpenXP.instance, proxy);
+		proxy.registerRenderInformation();
+		
+		//OCSLog.info( "OpenXP version %s starting", FMLCommonHandler.instance().findContainerFor(instance).getVersion() );
+	}
 
 	@Mod.PreInit
 	public void preInit( FMLPreInitializationEvent evt )
@@ -105,25 +115,15 @@ public class OpenXP
 		prop.comment = "The block ID for the auto anvil block";
 		Config.autoAnvilBlockID = prop.getInt();
 		
-		prop = configFile.getBlock("healingStoneID", 504);
-		prop.comment = "The block ID for the healing stone block";
-		Config.healingStoneID = prop.getInt();
+		prop = configFile.getBlock("lifeStoneID", 504);
+		prop.comment = "The block ID for the life stone block";
+		Config.lifeStoneID = prop.getInt();
 
 		prop = configFile.getItem("liquidXpItemID", 3000);
 		prop.comment = "The item ID for liquid XP";
 		Config.liquidXpItemID = prop.getInt();
 		
 		configFile.save();		
-	}
-
-	@Mod.Init
-	public void init( FMLInitializationEvent evt )
-	{
-		proxy.init();
-		NetworkRegistry.instance().registerGuiHandler(OpenXP.instance, proxy);
-		proxy.registerRenderInformation();
-		
-		//OCSLog.info( "OpenXP version %s starting", FMLCommonHandler.instance().findContainerFor(instance).getVersion() );
 	}
 
 

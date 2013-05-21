@@ -29,12 +29,19 @@ public class BlockXPSponge extends BlockContainer {
 	}
 
 	@Override
+    public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune)
+    {
+    	ArrayList<ItemStack> stacks = super.getBlockDropped(world, x, y, z, metadata, fortune);
+        for(int i = 0; i < stacks.size(); i++)
+        {
+            stacks.get(i).setItemDamage(metadata);
+        }
+        return stacks;
+    }
+
+	@Override
 	public int getRenderType() {
 		return OpenXP.renderId;
-	}
-
-	public boolean renderAsNormalBlock() {
-		return false;
 	}
 
 	public boolean isOpaqueCube() {
@@ -50,15 +57,8 @@ public class BlockXPSponge extends BlockContainer {
         }
     }
 	
-	@Override
-    public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune)
-    {
-    	ArrayList<ItemStack> stacks = super.getBlockDropped(world, x, y, z, metadata, fortune);
-        for(int i = 0; i < stacks.size(); i++)
-        {
-            stacks.get(i).setItemDamage(metadata);
-        }
-        return stacks;
-    }
+	public boolean renderAsNormalBlock() {
+		return false;
+	}
 
 }

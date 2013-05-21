@@ -16,6 +16,11 @@ import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {
 
 	@Override
+	public int getRenderId() {
+		return OpenXP.renderId;
+	}
+
+	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID,
 			RenderBlocks renderer) {
 
@@ -42,11 +47,6 @@ public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {
 	@Override
 	public boolean shouldRender3DInInventory() {
 		return true;
-	}
-
-	@Override
-	public int getRenderId() {
-		return OpenXP.renderId;
 	}
 
 }

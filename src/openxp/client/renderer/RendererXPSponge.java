@@ -26,17 +26,6 @@ import org.lwjgl.opengl.GL12;
 
 public class RendererXPSponge extends TileEntitySpecialRenderer {
 
-	protected ModelXPSponge model = new ModelXPSponge();
-	RenderItem renderItem;
-	protected ItemStack emptyBottleStack;
-	protected ItemStack xpBottleStack;
-
-	protected Random rnd = new Random();
-
-	protected orb[] orbs;
-
-	RenderBlocks renderBlocks = new RenderBlocks();
-
 	public class orb {
 		public double x = rnd.nextDouble() * 0.6;
 		public double y = 0;
@@ -45,12 +34,74 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 		public int color = 0;
 
 	}
+	protected ModelXPSponge model = new ModelXPSponge();
+	RenderItem renderItem;
+	protected ItemStack emptyBottleStack;
+
+	protected ItemStack xpBottleStack;
+
+	protected Random rnd = new Random();
+
+	protected orb[] orbs;
+
+	RenderBlocks renderBlocks = new RenderBlocks();
 
 	public RendererXPSponge() {
 		orbs = new orb[10];
 		for (int i = 0; i < orbs.length; i++) {
 			orbs[i] = new orb();
 		}
+	}
+
+	private void renderOrbs(double x, double y, double z, orb o) {
+
+		GL11.glPushMatrix();
+		GL11.glTranslated(x + o.x + 0.2, y + o.y, z + o.z + 0.2);
+		int i = o.tex;
+		bindTextureByName("/item/xporb.png");
+		Tessellator tessellator = Tessellator.instance;
+		float f2 = (float) (i % 4 * 16 + 0) / 64.0F;
+		float f3 = (float) (i % 4 * 16 + 16) / 64.0F;
+		float f4 = (float) (i / 4 * 16 + 0) / 64.0F;
+		float f5 = (float) (i / 4 * 16 + 16) / 64.0F;
+		float f6 = 1.0F;
+		float f7 = 0.5F;
+		float f8 = 0.25F;
+		int j = 255;
+		int k = j % 65536;
+		int l = j / 65536;
+		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+				(float) k / 1.0F, (float) l / 1.0F);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		float f9 = 255.0F;
+		if (rnd.nextInt(10) == 1) {
+			o.color++;
+		}
+		float f10 = ((float) o.color + f9) / 2.0F;
+		l = (int) ((MathHelper.sin(f10 + 0.0F) + 1.0F) * 0.5F * f9);
+		int i1 = (int) f9;
+		int j1 = (int) ((MathHelper.sin(f10 + 4.1887903F) + 1.0F) * 0.1F * f9);
+		int k1 = l << 16 | i1 << 8 | j1;
+		GL11.glRotatef(180.0F - RenderManager.instance.playerViewY, 0.0F, 1.0F,
+				0.0F);
+		GL11.glRotatef(-RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+		float f11 = 0.2F;
+		GL11.glScalef(f11, f11, f11);
+		tessellator.startDrawingQuads();
+		tessellator.setColorRGBA_I(k1, 128);
+		tessellator.setNormal(0.0F, 1.0F, 0.0F);
+		tessellator.addVertexWithUV((double) (0.0F - f7), (double) (0.0F - f8),
+				0.0D, (double) f2, (double) f5);
+		tessellator.addVertexWithUV((double) (f6 - f7), (double) (0.0F - f8),
+				0.0D, (double) f3, (double) f5);
+		tessellator.addVertexWithUV((double) (f6 - f7), (double) (1.0F - f8),
+				0.0D, (double) f3, (double) f4);
+		tessellator.addVertexWithUV((double) (0.0F - f7), (double) (1.0F - f8),
+				0.0D, (double) f2, (double) f4);
+		tessellator.draw();
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+		GL11.glPopMatrix();
 	}
 
 	@Override
@@ -131,57 +182,6 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 
 		GL11.glPopMatrix();
 
-	}
-
-	private void renderOrbs(double x, double y, double z, orb o) {
-
-		GL11.glPushMatrix();
-		GL11.glTranslated(x + o.x + 0.2, y + o.y, z + o.z + 0.2);
-		int i = o.tex;
-		bindTextureByName("/item/xporb.png");
-		Tessellator tessellator = Tessellator.instance;
-		float f2 = (float) (i % 4 * 16 + 0) / 64.0F;
-		float f3 = (float) (i % 4 * 16 + 16) / 64.0F;
-		float f4 = (float) (i / 4 * 16 + 0) / 64.0F;
-		float f5 = (float) (i / 4 * 16 + 16) / 64.0F;
-		float f6 = 1.0F;
-		float f7 = 0.5F;
-		float f8 = 0.25F;
-		int j = 255;
-		int k = j % 65536;
-		int l = j / 65536;
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
-				(float) k / 1.0F, (float) l / 1.0F);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		float f9 = 255.0F;
-		if (rnd.nextInt(10) == 1) {
-			o.color++;
-		}
-		float f10 = ((float) o.color + f9) / 2.0F;
-		l = (int) ((MathHelper.sin(f10 + 0.0F) + 1.0F) * 0.5F * f9);
-		int i1 = (int) f9;
-		int j1 = (int) ((MathHelper.sin(f10 + 4.1887903F) + 1.0F) * 0.1F * f9);
-		int k1 = l << 16 | i1 << 8 | j1;
-		GL11.glRotatef(180.0F - RenderManager.instance.playerViewY, 0.0F, 1.0F,
-				0.0F);
-		GL11.glRotatef(-RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
-		float f11 = 0.2F;
-		GL11.glScalef(f11, f11, f11);
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_I(k1, 128);
-		tessellator.setNormal(0.0F, 1.0F, 0.0F);
-		tessellator.addVertexWithUV((double) (0.0F - f7), (double) (0.0F - f8),
-				0.0D, (double) f2, (double) f5);
-		tessellator.addVertexWithUV((double) (f6 - f7), (double) (0.0F - f8),
-				0.0D, (double) f3, (double) f5);
-		tessellator.addVertexWithUV((double) (f6 - f7), (double) (1.0F - f8),
-				0.0D, (double) f3, (double) f4);
-		tessellator.addVertexWithUV((double) (0.0F - f7), (double) (1.0F - f8),
-				0.0D, (double) f2, (double) f4);
-		tessellator.draw();
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		GL11.glPopMatrix();
 	}
 
 }

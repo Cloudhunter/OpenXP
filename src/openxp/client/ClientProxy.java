@@ -22,6 +22,22 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 public class ClientProxy extends CommonProxy {
 
 	@Override
+	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
+			int x, int y, int z) {
+		if ((world instanceof WorldClient)) {
+			TileEntity tile = world.getBlockTileEntity(x, y, z);
+			if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
+				  return new GuiAutomatedEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS), (TileEntityAutomatedEnchantmentTable)tile);
+			}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
+				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
+			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
+				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public void registerRenderInformation() {
 		OpenXP.renderId = RenderingRegistry.getNextAvailableRenderId();
 
@@ -36,21 +52,5 @@ public class ClientProxy extends CommonProxy {
 				TileEntityAutoAnvil.class,
 				new RendererAutoAnvil()
 		);
-	}
-
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
-		if ((world instanceof WorldClient)) {
-			TileEntity tile = world.getBlockTileEntity(x, y, z);
-			if (ID == OpenXP.Gui.enchantmentTable.ordinal()) {
-				  return new GuiAutomatedEnchantment(new ContainerGeneric(player.inventory, tile, TileEntityAutomatedEnchantmentTable.SLOTS), (TileEntityAutomatedEnchantmentTable)tile);
-			}else if (ID == OpenXP.Gui.xpBottler.ordinal()) {
-				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
-			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
-				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
-			}
-		}
-		return null;
 	}
 }

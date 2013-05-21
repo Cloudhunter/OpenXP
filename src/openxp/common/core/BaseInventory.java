@@ -31,50 +31,22 @@ public class BaseInventory implements IInventory, ISidedInventory {
 		callbacks.add(callback);
 	}
 	
-    public void onInventoryChanged() {
-        for (int i = 0; i < callbacks.size(); ++i)
-        {
-            callbacks.get(i).onInventoryChanged(this);
-        }
-    }
-
-
-	public void readFromNBT(NBTTagCompound tag) {
-		NBTTagList nbttaglist = tag.getTagList("Items");
-		inventoryContents = new ItemStack[getSizeInventory()];
-		for (int i = 0; i < nbttaglist.tagCount(); i++) {
-			NBTTagCompound stacktag = (NBTTagCompound) nbttaglist.tagAt(i);
-			int j = stacktag.getByte("Slot") & 0xff;
-			if (j >= 0 && j < inventoryContents.length) {
-				inventoryContents[j] = ItemStack.loadItemStackFromNBT(stacktag);
-			}
-		}
+    @Override
+	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-
-	public void writeToNBT(NBTTagCompound tag) {
-
-		NBTTagList nbttaglist = new NBTTagList();
-		for (int i = 0; i < inventoryContents.length; i++) {
-			if (inventoryContents[i] != null) {
-				NBTTagCompound stacktag = new NBTTagCompound();
-				stacktag.setByte("Slot", (byte) i);
-				inventoryContents[i].writeToNBT(stacktag);
-				nbttaglist.appendTag(stacktag);
-			}
-		}
-
-		tag.setTag("Items", nbttaglist);
-	}
 
 	@Override
-	public int getSizeInventory() {
-		return slotsCount;
+	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
+
 	@Override
-	public ItemStack getStackInSlot(int i) {
-        return this.inventoryContents[i];
+	public void closeChest() {
 	}
 
 	@Override
@@ -108,9 +80,31 @@ public class BaseInventory implements IInventory, ISidedInventory {
             return null;
         }
 	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int var1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return 64;
+	}
 	
-	public boolean isItem(int slot, Item item) {
-		return inventoryContents[slot] != null && inventoryContents[slot].getItem() == item;
+	@Override
+	public String getInvName() {
+        return this.inventoryTitle;
+	}
+
+	@Override
+	public int getSizeInventory() {
+		return slotsCount;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int i) {
+        return this.inventoryContents[i];
 	}
 
 	@Override
@@ -128,6 +122,48 @@ public class BaseInventory implements IInventory, ISidedInventory {
 	}
 
 	@Override
+	public boolean isInvNameLocalized() {
+		return isInvNameLocalized;
+	}
+
+	public boolean isItem(int slot, Item item) {
+		return inventoryContents[slot] != null && inventoryContents[slot].getItem() == item;
+	}
+
+	@Override
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		return true;
+	}
+
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+		return true;
+	}
+
+	public void onInventoryChanged() {
+        for (int i = 0; i < callbacks.size(); ++i)
+        {
+            callbacks.get(i).onInventoryChanged(this);
+        }
+    }
+
+	@Override
+	public void openChest() {
+	}
+
+	public void readFromNBT(NBTTagCompound tag) {
+		NBTTagList nbttaglist = tag.getTagList("Items");
+		inventoryContents = new ItemStack[getSizeInventory()];
+		for (int i = 0; i < nbttaglist.tagCount(); i++) {
+			NBTTagCompound stacktag = (NBTTagCompound) nbttaglist.tagAt(i);
+			int j = stacktag.getByte("Slot") & 0xff;
+			if (j >= 0 && j < inventoryContents.length) {
+				inventoryContents[j] = ItemStack.loadItemStackFromNBT(stacktag);
+			}
+		}
+	}
+
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
         this.inventoryContents[i] = itemstack;
 
@@ -139,55 +175,19 @@ public class BaseInventory implements IInventory, ISidedInventory {
         this.onInventoryChanged();
 	}
 
-	@Override
-	public String getInvName() {
-        return this.inventoryTitle;
-	}
+	public void writeToNBT(NBTTagCompound tag) {
 
-	@Override
-	public boolean isInvNameLocalized() {
-		return isInvNameLocalized;
-	}
+		NBTTagList nbttaglist = new NBTTagList();
+		for (int i = 0; i < inventoryContents.length; i++) {
+			if (inventoryContents[i] != null) {
+				NBTTagCompound stacktag = new NBTTagCompound();
+				stacktag.setByte("Slot", (byte) i);
+				inventoryContents[i].writeToNBT(stacktag);
+				nbttaglist.appendTag(stacktag);
+			}
+		}
 
-	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return true;
-	}
-
-	@Override
-	public void openChest() {
-	}
-
-	@Override
-	public void closeChest() {
-	}
-
-	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
-		return true;
-	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int var1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
-		// TODO Auto-generated method stub
-		return false;
+		tag.setTag("Items", nbttaglist);
 	}
     
 }

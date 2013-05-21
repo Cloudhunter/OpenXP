@@ -11,7 +11,7 @@ import net.minecraftforge.liquids.LiquidStack;
 import openxp.OpenXP;
 import openxp.common.block.BlockAutoAnvil;
 import openxp.common.block.BlockAutomatedEnchantmentTable;
-import openxp.common.block.BlockHealingStone;
+import openxp.common.block.BlockLifeStone;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.ccintegration.PeripheralRegistry;
@@ -33,46 +33,10 @@ import dan200.turtle.api.TurtleAPI;
 public class CommonProxy implements IGuiHandler
 {   
 	
-	public void init()
-	{
-		initBlocks();
-		initItems();
-		setupLanguages();
-		
-		if (ModLoader.isModLoaded("ComputerCraft")) {
-			TurtleAPI.registerUpgrade(new TurtleOpenXP());
-			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
-			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralRegistry());
-		}
-	}
-
-	private void setupLanguages() {
-		LanguageUtils.setupLanguages();
-	}
-
-	private void initBlocks()
-	{
-		OpenXP.Blocks.XPSponge = new BlockXPSponge();
-		OpenXP.Blocks.enchantmentTable = new BlockAutomatedEnchantmentTable();
-		OpenXP.Blocks.XPBottler = new BlockXPBottler();
-		OpenXP.Blocks.autoAnvil = new BlockAutoAnvil();
-		OpenXP.Blocks.healingStone = new BlockHealingStone();
-	}
-	
-	private void initItems()
-	{
-		OpenXP.spectralMaterial = EnumHelper.addToolMaterial("SPECTRAL", 2, 400, 6.0F, 2, 14);
-		OpenXP.spectralMaterial.customCraftingMaterial = Item.expBottle;
-		
-		OpenXP.Items.liquidXP = new ItemLiquidXP();
-	
-		LiquidDictionary.getOrCreateLiquid("liquidxp", new LiquidStack(OpenXP.Items.liquidXP, 1));
-		
-		OpenXP.liquidStack = LiquidDictionary.getCanonicalLiquid("liquidxp");
-	}	
-	
-	public void registerRenderInformation() {
-
+	@Override
+	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
+			int x, int y, int z) {
+		return null;
 	}
 
 	@Override
@@ -91,11 +55,47 @@ public class CommonProxy implements IGuiHandler
 		return null;
 	}
 
+	public void init()
+	{
+		initBlocks();
+		initItems();
+		setupLanguages();
+		
+		if (ModLoader.isModLoaded("ComputerCraft")) {
+			TurtleAPI.registerUpgrade(new TurtleOpenXP());
+			TickRegistry.registerTickHandler(new TickHandler(), Side.SERVER);
+			ComputerCraftAPI.registerExternalPeripheral(BaseTileEntity.class, new PeripheralRegistry());
+		}
+	}
+	
+	private void initBlocks()
+	{
+		OpenXP.Blocks.XPSponge = new BlockXPSponge();
+		OpenXP.Blocks.enchantmentTable = new BlockAutomatedEnchantmentTable();
+		OpenXP.Blocks.XPBottler = new BlockXPBottler();
+		OpenXP.Blocks.autoAnvil = new BlockAutoAnvil();
+		OpenXP.Blocks.lifeStone = new BlockLifeStone();
+	}	
+	
+	private void initItems()
+	{
+		OpenXP.spectralMaterial = EnumHelper.addToolMaterial("SPECTRAL", 2, 400, 6.0F, 2, 14);
+		OpenXP.spectralMaterial.customCraftingMaterial = Item.expBottle;
+		
+		OpenXP.Items.liquidXP = new ItemLiquidXP();
+	
+		LiquidDictionary.getOrCreateLiquid("liquidxp", new LiquidStack(OpenXP.Items.liquidXP, 1));
+		
+		OpenXP.liquidStack = LiquidDictionary.getCanonicalLiquid("liquidxp");
+	}
+
+	public void registerRenderInformation() {
+
+	}
 
 
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
-		return null;
+
+	private void setupLanguages() {
+		LanguageUtils.setupLanguages();
 	}
 }

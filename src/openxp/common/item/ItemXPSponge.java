@@ -11,12 +11,12 @@ public class ItemXPSponge extends ItemBlock {
 	}
 	
 	@Override
-	public boolean getShareTag() {
-		return true;
+	public int getMetadata(int damage) {
+		return damage;
 	}
 
 	@Override
-	public int getMetadata(int damage) {
-		return damage;
+	public boolean getShareTag() {
+		return true;
 	}
 }

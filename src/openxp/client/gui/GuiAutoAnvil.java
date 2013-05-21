@@ -58,15 +58,15 @@ public class GuiAutoAnvil extends SimpleGui {
     }
 	
 	
+	@Override
+	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
+		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.autoanvil");
+	}
+
 	private void drawPanel(SimpleGuiButton button, int mouseX, int mouseY) {
 		int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
 		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);        
-	}
-
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
-		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.autoanvil");
 	}
 }

@@ -17,24 +17,9 @@ public class SimpleGui extends GuiContainer {
 
 
 	@Override
-    protected void mouseClicked(int x, int y, int par3)
-    {
-	    super.mouseClicked(x, y, par3);
-	    if (buttons == null) {
-			return;
-		}
-		for (int i = 0; i < buttons.length; i++) {
-			if (buttons[i].isMouseOver(x, y, width, height, xSize, ySize)) {
-				tileentity.onClientButtonClicked(buttons[i].index);
-				this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, buttons[i].index);
-			}
-		}
-    }
-	
-	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
 	}
-
+	
 	protected void drawGuiContainerForegroundLayer(int par1, int par2, String name) {
 		String machineName = StatCollector.translateToLocal(name);
 		fontRenderer.drawString(
@@ -50,4 +35,19 @@ public class SimpleGui extends GuiContainer {
 			4210752
 		);
 	}
+
+	@Override
+    protected void mouseClicked(int x, int y, int par3)
+    {
+	    super.mouseClicked(x, y, par3);
+	    if (buttons == null) {
+			return;
+		}
+		for (int i = 0; i < buttons.length; i++) {
+			if (buttons[i].isMouseOver(x, y, width, height, xSize, ySize)) {
+				tileentity.onClientButtonClicked(buttons[i].index);
+				this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, buttons[i].index);
+			}
+		}
+    }
 }
