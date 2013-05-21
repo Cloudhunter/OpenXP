@@ -65,191 +65,8 @@ ITankCallback  {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
+
 	
-
-	@Override
-	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
-		return true;
-	}
-	
-	@Override
-	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
-		return isStackValidForSlot(slotID, itemstack);
-	}
-
-
-	@Override
-	public void closeChest() {
-		inventory.closeChest();
-	}
-
-	@Override
-	public ItemStack decrStackSize(int stackIndex, int byAmount) {
-		return inventory.decrStackSize(stackIndex, byAmount);
-	}
-
-	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tanks.drain(from, maxDrain, doDrain);
-	}
-	
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tanks.drain(tankIndex, maxDrain, doDrain);
-	}
-
-	@Override
-	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return tanks.fill(from, resource, doFill);
-	}
-
-	@Override
-	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return tanks.fill(tankIndex, resource, doFill);
-	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		if (side == BlockSide.TOP) {
-			return new int[] { INPUT_STACK };
-		}else if (side == BlockSide.BOTTOM) {
-			return new int[] { MODIFIER_STACK };
-		}
-		return new int[] { OUTPUT_STACK };
-	}
-
-	@Override
-	public int getGuiValue(int index) {
-		return guiValues.get(index).getValue();
-	}
-
-	@Override
-	public int[] getGuiValues() {
-		return guiValues.asIntArray();
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return inventory.getInventoryStackLimit();
-	}
-
-	@Override
-	public String getInvName() {
-		return inventory.getInvName();
-	}
-
-	public double getPercentProgress() {
-		return 100.0 / getSpeed() * getProgress();
-	}
-
-	public int getPercentRequired() {
-		return percentRequired.getValue();
-	}
-
-	public int getPercentStored() {
-		return percentStored.getValue();
-	}
-
-	public int getProgress() {
-		return progress.getValue();
-	}
-
-	public int getRotation() {
-		if (worldObj == null) {
-			return 0;
-		}
-		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-	}
-
-	@Override
-	public int getSizeInventory() {
-		return inventory.getSizeInventory();
-	}
-
-	public int getSpeed() {
-		return 20;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int i) {
-		return inventory.getStackInSlot(i);
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int i) {
-		return inventory.getStackInSlotOnClosing(i);
-	}
-
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks.getTank(direction, type);
-	}
-
-	@Override
-	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return tanks.getTanks(direction);
-	}
-
-	@Override
-	public boolean isInvNameLocalized() {
-		return inventory.isInvNameLocalized();
-	}
-
-	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
-		return inventory.isStackValidForSlot(i, itemstack);
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return inventory.isUseableByPlayer(entityplayer);
-	}
-
-	@Override
-	public void onClientButtonClicked(int button) {
-
-	}
-
-	@Override
-	public void onInventoryChanged(BaseInventory inventory) {
-		hasChanged = true;
-	}
-
-	@Override
-	public void onServerButtonClicked(EntityPlayer player, int button) {
-		onClientButtonClicked(button);
-	}
-
-	@Override
-	public void onTankChanged(BaseTankContainer tankContainer, int index) {
-		hasChanged = true;
-	}
-
-	@Override
-	public void openChest() {
-		inventory.openChest();
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		inventory.readFromNBT(tag);
-		tanks.readFromNBT(tag);
-		percentStored.readFromNBT(tag);
-		percentRequired.readFromNBT(tag);
-		progress.readFromNBT(tag);
-	}
-
-	@Override
-	public void setGuiValue(int i, int value) {
-		guiValues.get(i).setValue(value);
-	}
-
-	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		inventory.setInventorySlotContents(i, itemstack);
-	}
-
 	@Override
 	public void updateEntity() {
 
@@ -532,6 +349,16 @@ ITankCallback  {
     }
 
 	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		inventory.readFromNBT(tag);
+		tanks.readFromNBT(tag);
+		percentStored.readFromNBT(tag);
+		percentRequired.readFromNBT(tag);
+		progress.readFromNBT(tag);
+	}
+	
+	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
 		inventory.writeToNBT(tag);
@@ -539,5 +366,188 @@ ITankCallback  {
 		percentStored.writeToNBT(tag);
 		percentRequired.writeToNBT(tag);
 		progress.writeToNBT(tag);
+	}
+	
+	public double getPercentProgress() {
+		return 100.0 / getSpeed() * getProgress();
+	}
+
+	public int getPercentRequired() {
+		return percentRequired.getValue();
+	}
+
+	public int getPercentStored() {
+		return percentStored.getValue();
+	}
+
+	public int getProgress() {
+		return progress.getValue();
+	}
+
+	public int getRotation() {
+		if (worldObj == null) {
+			return 0;
+		}
+		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+	}
+
+	public int getSpeed() {
+		return 20;
+	}
+
+	/* IInventory implementation */
+	
+	@Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
+		return true;
+	}
+	
+	@Override
+	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
+		return isStackValidForSlot(slotID, itemstack);
+	}
+
+	@Override
+	public void closeChest() {
+		inventory.closeChest();
+	}
+
+	@Override
+	public ItemStack decrStackSize(int stackIndex, int byAmount) {
+		return inventory.decrStackSize(stackIndex, byAmount);
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		if (side == BlockSide.TOP) {
+			return new int[] { INPUT_STACK };
+		}else if (side == BlockSide.BOTTOM) {
+			return new int[] { MODIFIER_STACK };
+		}
+		return new int[] { OUTPUT_STACK };
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return inventory.getInventoryStackLimit();
+	}
+
+	@Override
+	public String getInvName() {
+		return inventory.getInvName();
+	}	
+
+	@Override
+	public int getSizeInventory() {
+		return inventory.getSizeInventory();
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int i) {
+		return inventory.getStackInSlot(i);
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(int i) {
+		return inventory.getStackInSlotOnClosing(i);
+	}
+
+	@Override
+	public boolean isInvNameLocalized() {
+		return inventory.isInvNameLocalized();
+	}
+
+	@Override
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		return inventory.isStackValidForSlot(i, itemstack);
+	}
+
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+		return inventory.isUseableByPlayer(entityplayer);
+	}
+
+	@Override
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		inventory.setInventorySlotContents(i, itemstack);
+	}
+	
+	@Override
+	public void openChest() {
+		inventory.openChest();
+	}
+	
+	/* ITankContainer implementation */
+
+	@Override
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks.getTank(direction, type);
+	}
+
+	@Override
+	public ILiquidTank[] getTanks(ForgeDirection direction) {
+		return tanks.getTanks(direction);
+	}
+	
+	@Override
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return tanks.drain(from, maxDrain, doDrain);
+	}
+	
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		return tanks.drain(tankIndex, maxDrain, doDrain);
+	}
+
+	@Override
+	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+		return tanks.fill(from, resource, doFill);
+	}
+
+	@Override
+	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
+		return tanks.fill(tankIndex, resource, doFill);
+	}
+
+	/* ITankCallback implementation */
+	
+	@Override
+	public void onTankChanged(BaseTankContainer tankContainer, int index) {
+		hasChanged = true;
+	}
+
+
+	/* IHasSimpleGui Implementation */
+
+	@Override
+	public void onClientButtonClicked(int button) {
+
+	}
+	
+	@Override
+	public void setGuiValue(int i, int value) {
+		guiValues.get(i).setValue(value);
+	}
+
+	@Override
+	public void onServerButtonClicked(EntityPlayer player, int button) {
+		onClientButtonClicked(button);
+	}
+
+	@Override
+	public int getGuiValue(int index) {
+		return guiValues.get(index).getValue();
+	}
+
+	@Override
+	public int[] getGuiValues() {
+		return guiValues.asIntArray();
+	}
+	
+	/* IInventoryCallback implementation */
+	
+	@Override
+	public void onInventoryChanged(BaseInventory inventory) {
+		hasChanged = true;
 	}
 }
