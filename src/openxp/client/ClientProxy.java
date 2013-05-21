@@ -7,13 +7,16 @@ import net.minecraft.world.World;
 import openxp.OpenXP;
 import openxp.client.gui.GuiAutoAnvil;
 import openxp.client.gui.GuiAutomatedEnchantment;
+import openxp.client.gui.GuiLifeStone;
 import openxp.client.gui.GuiXPBottler;
 import openxp.client.renderer.RendererAutoAnvil;
+import openxp.client.renderer.RendererLifeStone;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.TileEntityLifeStone;
 import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -32,6 +35,8 @@ public class ClientProxy extends CommonProxy {
 				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
 			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
 				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
+			}else if (ID == OpenXP.Gui.lifeStone.ordinal()) {
+				return new GuiLifeStone(new ContainerGeneric(player.inventory, tile, null), (TileEntityLifeStone)tile);
 			}
 		}
 		return null;
@@ -51,6 +56,11 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(
 				TileEntityAutoAnvil.class,
 				new RendererAutoAnvil()
+		);
+
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityLifeStone.class,
+				new RendererLifeStone()
 		);
 	}
 }

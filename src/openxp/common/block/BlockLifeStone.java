@@ -23,13 +23,14 @@ public class BlockLifeStone extends BlockContainer {
 	public TileEntity createNewTileEntity(World world) {
 		return new TileEntityLifeStone();
 	}
-	
-    public boolean onBlockEventReceived(World world, int x, int y, int z, int eventType, int eventParam)
-    {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te != null && te instanceof TileEntityLifeStone) {
-        	((TileEntityLifeStone)te).onBlockEventReceived(eventType, eventParam);
-        }
-        return true;
-    }
+
+	@Override
+	public int getRenderType() {
+		return OpenXP.renderId;
+	}
+
+	@Override
+	public boolean isOpaqueCube() {
+		return false;
+	}
 }

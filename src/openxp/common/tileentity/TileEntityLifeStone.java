@@ -51,7 +51,7 @@ public class TileEntityLifeStone extends BaseTileEntity implements ITankContaine
 				yCoord + range.getValue()+1,
 				zCoord + range.getValue()+1
 		);
-		tilePosition = Vec3.createVectorHelper(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+		tilePosition = Vec3.createVectorHelper(xCoord + 0.5, yCoord, zCoord + 0.5);
 	}
 	
 
@@ -135,11 +135,16 @@ public class TileEntityLifeStone extends BaseTileEntity implements ITankContaine
 		}
 		
 		if (worldObj.isRemote){
+				
+			  double distanceFromTile = tilePosition.distanceTo(healingLocation);
+			  distanceFromTile = Math.min(distanceFromTile, 6);
+			  distanceFromTile /= 6;
+			  
 			  worldObj.spawnParticle(
 				particle,
-				healingLocation.xCoord + (worldObj.rand.nextDouble() * 2 - 1),
-				healingLocation.yCoord + (worldObj.rand.nextDouble() * 2 - 1),
-				healingLocation.zCoord + (worldObj.rand.nextDouble() * 2 - 1),
+				healingLocation.xCoord + ((worldObj.rand.nextDouble() * 2 - 1) * distanceFromTile),
+				healingLocation.yCoord + ((worldObj.rand.nextDouble() * 2 - 1) * distanceFromTile),
+				healingLocation.zCoord + ((worldObj.rand.nextDouble() * 2 - 1) * distanceFromTile),
 				0.0D, 0.0D, 0.0D);
 		}
 		
@@ -170,13 +175,14 @@ public class TileEntityLifeStone extends BaseTileEntity implements ITankContaine
 
 	@Override
 	public void readFromNetwork(NBTTagCompound tag) {
+		
 		if (healingLocation == null) {
 			healingLocation = Vec3.createVectorHelper(xCoord, yCoord, zCoord);
 		}
+		
 		healingLocation.xCoord = tag.getDouble("hX");
 		healingLocation.yCoord = tag.getDouble("hY");
 		healingLocation.zCoord = tag.getDouble("hZ");
-		
 		targetId = tag.getInteger("tid");
 	}
 

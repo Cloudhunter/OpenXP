@@ -50,7 +50,8 @@ public class OpenXP
 	{
 		enchantmentTable,
 		xpBottler,
-		autoAnvil
+		autoAnvil,
+		lifeStone
 	}
 	
 	public static class Items

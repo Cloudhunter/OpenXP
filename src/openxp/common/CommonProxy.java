@@ -50,6 +50,8 @@ public class CommonProxy implements IGuiHandler
 			return new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS);	
 		}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
 			return new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS);
+		}else if (ID == OpenXP.Gui.lifeStone.ordinal()) {
+			return new ContainerGeneric(player.inventory, tile, new int[] {});
 		}
 		
 		return null;
