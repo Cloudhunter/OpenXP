@@ -56,18 +56,24 @@ public class BaseTurtlePeripheral {
 			offset++;
 		}
 		if (exposedMethod.onTick()) {
-			Future callback = TickHandler.addTickCallback(
-				turtle.getWorld(),
-				new Callable() {
-					@Override
-					public Object call() throws Exception {
-						return exposedMethod.getMethod().invoke(self, args);
+			try {
+				Future callback = TickHandler.addTickCallback(
+					turtle.getWorld(),
+					new Callable() {
+						@Override
+						public Object call() throws Exception {
+							return exposedMethod.getMethod().invoke(self, args);
+						}
 					}
-				}
-			);
-			return new Object[] { callback.get() };
+				);
+				return new Object[] { callback.get() };
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			return new Object[] { exposedMethod.getMethod().invoke(self, args) };
 		}
+		return null;
 	}
+	
 }

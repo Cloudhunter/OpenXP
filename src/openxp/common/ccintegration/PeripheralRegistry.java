@@ -32,6 +32,7 @@ public class PeripheralRegistry implements IPeripheralHandler {
 					exposedMethods.add(new ExposedMethod(method));
 				}
 			}
+			
 			names.put(clazz, name);
 			peripherals.put(clazz, exposedMethods);
 	}

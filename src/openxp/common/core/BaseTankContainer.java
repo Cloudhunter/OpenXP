@@ -40,7 +40,7 @@ public class BaseTankContainer implements ITankContainer {
 	@Override
 	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
 		LiquidStack drained = tanks[tankIndex].drain(maxDrain, doDrain);
-		if (doDrain && drained.amount > 0) {
+		if (drained != null && doDrain && drained.amount > 0) {
 			onTankChanged(tankIndex);
 		}
 		return drained;

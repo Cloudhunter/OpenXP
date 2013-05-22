@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.world.IBlockAccess;
 import openxp.OpenXP;
 import openxp.common.tileentity.TileEntityAutoAnvil;
+import openxp.common.tileentity.TileEntityLifeStone;
 import openxp.common.tileentity.TileEntityXPSponge;
 
 import org.lwjgl.opengl.GL11;
@@ -33,6 +34,9 @@ public class GenericRenderingHandler implements ISimpleBlockRenderingHandler {
 			TileEntityXPSponge sponge = new TileEntityXPSponge();
 			sponge.setInventoryRenderAmount(metadata);
 			TileEntityRenderer.instance.renderTileEntityAt(sponge, 0.0D, 0.0D, 0.0D, 0.0F);
+		}else if (block == OpenXP.Blocks.lifeStone) {
+			GL11.glTranslatef(0F, 0.4F, 0F);
+			TileEntityRenderer.instance.renderTileEntityAt(new TileEntityLifeStone(), 0.0D, 0.0D, 0.0D, 0.0F);
 		}
 		
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);

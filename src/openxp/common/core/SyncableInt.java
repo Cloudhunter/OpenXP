@@ -41,4 +41,16 @@ public class SyncableInt {
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setInteger(name, value);
 	}
+	
+	public boolean is(int mask) {
+		return (value & mask) == mask;
+	}
+	
+	public void toggle(int mask) {
+		if (is(mask)) {
+			value &= ~mask;
+		}else {
+			value |= mask;
+		}
+	}
 }

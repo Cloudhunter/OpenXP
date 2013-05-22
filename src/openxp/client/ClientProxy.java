@@ -36,7 +36,7 @@ public class ClientProxy extends CommonProxy {
 			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
 				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
 			}else if (ID == OpenXP.Gui.lifeStone.ordinal()) {
-				return new GuiLifeStone(new ContainerGeneric(player.inventory, tile, null), (TileEntityLifeStone)tile);
+				return new GuiLifeStone(new ContainerGeneric(player.inventory, tile, new int[] {}), (TileEntityLifeStone)tile);
 			}
 		}
 		return null;
