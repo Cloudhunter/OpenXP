@@ -15,12 +15,12 @@ public class GuiAutomatedEnchantment extends SimpleGui {
 		super(container, (IHasSimpleGui) tile);
 		this.tileentity = tile;
 		buttons = new SimpleGuiButton[] {
-				new SimpleGuiButton(34, 26, 107, 15, "Lowest Level",
+				new SimpleGuiButton(34, 26, 108, 15, "Lowest Level",
 									TileEntityAutomatedEnchantmentTable.MODE_LOWEST,
-									0, 166),
-				new SimpleGuiButton(34, 42, 107, 15, "Highest Level",
+									0, 107),
+				new SimpleGuiButton(34, 42, 108, 15, "Highest Level",
 									TileEntityAutomatedEnchantmentTable.MODE_HIGHEST,
-									0, 166)
+									0, 107)
 		};
 	}
 	

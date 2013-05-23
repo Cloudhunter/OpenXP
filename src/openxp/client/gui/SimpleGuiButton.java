@@ -53,12 +53,14 @@ public class SimpleGuiButton {
 	
 	public void render(SimpleGui gui, boolean selected) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);    
-		gui.bindTexture();
+		gui.bindTexture("/mods/openxp/textures/gui/common.png");
 		int textureOffset = 0;
 		
-		if (selected) {
-			textureOffset += height;
+		if (isMouseOver() && selected) {
+			textureOffset = height * 3;
 		} else if (isMouseOver()) {
+			textureOffset += height;
+		} else if (selected) {
 			textureOffset += height * 2;
 		}
 		gui.drawTexturedModalRect(left + x, top + y, U, V + textureOffset, width, height);	

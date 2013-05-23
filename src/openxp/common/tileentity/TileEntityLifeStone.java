@@ -312,10 +312,10 @@ public class TileEntityLifeStone extends BaseTileEntity implements ITankContaine
 	public void onClientButtonClicked(int button) {
 		switch(button) {
 		case 0:
-			setRange(-1);
+			setRange(1);
 			break;
 		case 1:
-			setRange(1);
+			setRange(-1);
 			break;
 		case 2:
 			mode.toggle(MODE_HEAL_PLAYERS);

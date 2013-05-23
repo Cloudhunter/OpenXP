@@ -63,6 +63,9 @@ public class SimpleGui extends GuiContainer {
     }
 	
 	public void bindTexture() {
-		
+	}
+	
+	public void bindTexture(String texture) {
+		this.mc.renderEngine.bindTexture(texture);
 	}
 }

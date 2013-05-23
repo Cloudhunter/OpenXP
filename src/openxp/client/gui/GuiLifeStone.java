@@ -13,17 +13,18 @@ public class GuiLifeStone extends SimpleGui {
 	
 	private boolean isMouseDown = false;
 	private int mouseXOffset = 0;
-	
+
+	private GuiTank tank = new GuiTank();
 	
 	public GuiLifeStone(ContainerGeneric container, IHasSimpleGui tileentity) {
 		super(container, tileentity);
 		this.lifeStone = (TileEntityLifeStone) tileentity;
 
 		buttons = new SimpleGuiButton[] {
-				new SimpleGuiButton(45, 38, 10, 10, "-", 0, 176, 79),
-				new SimpleGuiButton(75, 38, 10, 10, "+", 1, 176, 79),
-				new SimpleGuiButton(58, 66, 10, 10, "*", 2, 176, 79),
-				new SimpleGuiButton(88, 66, 10, 10, "*", 3, 176, 79)
+				new SimpleGuiButton(10, 48, 7, 4, null, 0, 39, 67),
+				new SimpleGuiButton(10, 53, 7, 4, null, 1, 46, 67),
+				new SimpleGuiButton(9, 21, 10, 10, null, 2, 29, 67),
+				new SimpleGuiButton(9, 35, 10, 10, null, 3, 29, 67)
 		};
 	}
 	
@@ -31,6 +32,7 @@ public class GuiLifeStone extends SimpleGui {
 	protected void drawGuiContainerBackgroundLayer(float par1, int mouseX,
 			int mouseY) {
 		super.drawGuiContainerBackgroundLayer(par1, mouseX, mouseY);
+		
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		bindTexture();
 
@@ -46,21 +48,24 @@ public class GuiLifeStone extends SimpleGui {
     	buttons[3].render(this, lifeStone.isDamagingMobs());
     	
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-    	bindTexture();
-    	double stored = ((double)lifeStone.getPercentStored()) / 100.0;
-    	int tankHeight = (int)(67.0 * stored);
-		this.drawTexturedModalRect(left + 146, top + 9 + (67-tankHeight), 176, 67-tankHeight , 24, tankHeight);
-
+        tank.render(this, left + 147, top + 9, lifeStone.getPercentStored());
+		
+        fontRenderer.drawString("Heal players", left + 24, top + 21, 4210752);
+        fontRenderer.drawString("Damage mobs", left + 24, top + 35, 4210752);
         String s = String.format("Range: %s", lifeStone.getRange().getValue());
-        fontRenderer.drawString(s, left + xSize - 10 - fontRenderer.getStringWidth(s), top + 64, 4210752);
-        
-        
-        fontRenderer.drawString(String.format("%s/t", lifeStone.getCostPerTick()), left + 10, top + 64, 4210752);
+        fontRenderer.drawString(s, left + 24, top + 49, 4210752);
+        fontRenderer.drawString(String.format("%s/t", lifeStone.getCostPerTick()), left + 114, top + 72, 4210752);
 
 	}
 
 	@Override
 	public void bindTexture() {
-		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/lifestone.png");
+		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/base.png");
 	}
+	
+	@Override
+	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
+		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.lifestone");
+	}
+
 }
