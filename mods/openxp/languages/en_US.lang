@@ -1,0 +1,13 @@
+tile.openxp.xpsponge.name=XP Sponge
+tile.openxp.xpbottler.name=XP Bottler
+tile.openxp.enchantmenttable.name=Automated Enchanter
+tile.openxp.autoanvil.name=Automated Anvil
+tile.openxp.lifestone.name=Life Stone
+
+openxp.gui.xpbottler=XP Bottler
+openxp.gui.autoanvil=Automated Anvil
+openxp.gui.autoenchanter=Automated Enchanter
+openxp.gui.lifestone=Life Stone
+turtle.openxp.sensor.adjective=OpenXP
+
+itemGroup.tabOpenXP=OpenXP 

@@ -7,36 +7,22 @@ import net.minecraft.world.World;
 import openxp.OpenXP;
 import openxp.client.gui.GuiAutoAnvil;
 import openxp.client.gui.GuiAutomatedEnchantment;
+import openxp.client.gui.GuiLifeStone;
 import openxp.client.gui.GuiXPBottler;
 import openxp.client.renderer.RendererAutoAnvil;
+import openxp.client.renderer.RendererLifeStone;
 import openxp.client.renderer.RendererXPSponge;
 import openxp.common.CommonProxy;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityAutoAnvil;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.tileentity.TileEntityLifeStone;
 import openxp.common.tileentity.TileEntityXPBottler;
 import openxp.common.tileentity.TileEntityXPSponge;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
 public class ClientProxy extends CommonProxy {
-
-	@Override
-	public void registerRenderInformation() {
-		OpenXP.renderId = RenderingRegistry.getNextAvailableRenderId();
-
-		RenderingRegistry.registerBlockHandler(new GenericRenderingHandler());
-
-		ClientRegistry.bindTileEntitySpecialRenderer(
-				TileEntityXPSponge.class,
-				new RendererXPSponge()
-		);
-		
-		ClientRegistry.bindTileEntitySpecialRenderer(
-				TileEntityAutoAnvil.class,
-				new RendererAutoAnvil()
-		);
-	}
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
@@ -49,8 +35,32 @@ public class ClientProxy extends CommonProxy {
 				return new GuiXPBottler(new ContainerGeneric(player.inventory, tile, TileEntityXPBottler.SLOTS), (TileEntityXPBottler)tile);
 			}else if (ID == OpenXP.Gui.autoAnvil.ordinal()) {
 				return new GuiAutoAnvil(new ContainerGeneric(player.inventory, tile, TileEntityAutoAnvil.SLOTS), (TileEntityAutoAnvil)tile);
+			}else if (ID == OpenXP.Gui.lifeStone.ordinal()) {
+				return new GuiLifeStone(new ContainerGeneric(player.inventory, tile, new int[] {}), (TileEntityLifeStone)tile);
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void registerRenderInformation() {
+		OpenXP.renderId = RenderingRegistry.getNextAvailableRenderId();
+
+		RenderingRegistry.registerBlockHandler(new GenericRenderingHandler());
+		
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityXPSponge.class,
+				new RendererXPSponge()
+		);
+		
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityAutoAnvil.class,
+				new RendererAutoAnvil()
+		);
+
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityLifeStone.class,
+				new RendererLifeStone()
+		);
 	}
 }

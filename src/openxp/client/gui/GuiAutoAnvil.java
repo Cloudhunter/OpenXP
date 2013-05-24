@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL11;
 public class GuiAutoAnvil extends SimpleGui {
 
     private TileEntityAutoAnvil tileentity;
+	private GuiProgressBar progressBar = new GuiProgressBar();
+	private GuiTankWithRequirements tank = new GuiTankWithRequirements();
     
 	public GuiAutoAnvil(ContainerGeneric container, TileEntityAutoAnvil tile) {
 		super(container, (IHasSimpleGui) tile);
@@ -29,44 +31,14 @@ public class GuiAutoAnvil extends SimpleGui {
         int top = (height - ySize) / 2;
         this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize);
 
-        double required = ((double)tileentity.getPercentRequired()) / 100.0;
-		
-        boolean tooExpensive = false;
-        if (required > 1.0) {
-        	tooExpensive = true;
-        	required = 1.0;
-        }
-        
-        int tankHeightRequired = (int)(61.0 * required);
-		
-        this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
-		
-        this.drawTexturedModalRect(left + 149, top + 12 + (61-tankHeightRequired), tooExpensive ? 192 : 189, 61-tankHeightRequired , 3, tankHeightRequired);	
-        
-        
-		double stored = ((double)tileentity.getPercentStored()) / 100.0;
-		int storedHeight = (int)(61.0 * stored);
-
-        this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
-		this.drawTexturedModalRect(left + 154, top + 12 + (61-storedHeight), 176, 61-storedHeight , 13, storedHeight);
-
-		double progress = tileentity.getPercentProgress() / 100.0;
-		int progressWidth = (int)(29.0 * progress);
-
-		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
-		this.drawTexturedModalRect(left + 66, top + 36, 176, 67, progressWidth, 12);
+		tank.render(this, left + 146, top + 8, tileentity.getPercentStored(), tileentity.getPercentRequired());
+		progressBar.render(this, left + 66, top + 36, tileentity.getPercentProgress());
     }
 	
 	
-	private void drawPanel(SimpleGuiButton button, int mouseX, int mouseY) {
-		int left = (width - xSize) / 2;
-        int top = (height - ySize) / 2;
-		this.mc.renderEngine.bindTexture("/mods/openxp/textures/gui/autoanvil.png");
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);        
-	}
-
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
 		super.drawGuiContainerForegroundLayer(par1, par2, "openxp.gui.autoanvil");
 	}
+
 }

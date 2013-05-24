@@ -2,9 +2,9 @@ package openxp.common.core;
 
 import java.util.ArrayList;
 
-public class GuiValueHolder extends ArrayList<SavableInt> {
+public class GuiValueHolder extends ArrayList<SyncableInt> {
 	
-	public GuiValueHolder(SavableInt ... values) {
+	public GuiValueHolder(SyncableInt ... values) {
 		super(values.length);
 		for (int i = 0; i < values.length; i++) {
 			add(values[i]);

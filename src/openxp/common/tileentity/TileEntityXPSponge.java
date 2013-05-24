@@ -11,20 +11,23 @@ import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.common.core.BaseTankContainer;
 import openxp.common.core.BaseTileEntity;
-import openxp.common.core.SavableInt;
+import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
 import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(30)));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+			new XPTank(EnchantmentUtils.getLiquidForLevel(30))
+	);
 	
-	private SavableInt lastFilled = new SavableInt("lastFilled");
+	private SyncableInt lastFilled = new SyncableInt("lastFilled");
 	
 	private AxisAlignedBB suckupBounds;
 	private AxisAlignedBB destroyBounds;
+	private int inventoryRenderAmount =  0;
 	
 	public TileEntityXPSponge() {
 		
@@ -52,53 +55,46 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 	}
 	
 	@Override
-	public void updateEntity() {
-
-		createBounds();
-		
-		List<EntityXPOrb> orbs = (List<EntityXPOrb>) worldObj.getEntitiesWithinAABB(EntityXPOrb.class, suckupBounds);
-		
-		for (EntityXPOrb entity : orbs) {
-
-			double x = (xCoord + 0.5D - entity.posX) / 15.0D;
-			double y = (yCoord + 0.5D - entity.posY) / 15.0D;
-			double z = (zCoord + 0.5D - entity.posZ) / 15.0D;
-			
-			double distance = Math.sqrt(x * x + y * y + z * z);
-			double var11 = 1.0D - distance;
-			
-			if (var11 > 0.0D) {
-				var11 *= var11;
-				entity.motionX += x / distance * var11 * 0.05;
-				entity.motionY += y / distance * var11 * 0.2;
-				entity.motionZ += z / distance * var11 * 0.05;
-			}
-			
-			if (!worldObj.isRemote) {
-				if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
-					tanks.fill(LiquidDictionary.getLiquid("liquidxp", entity.getXpValue()), true);
-					entity.setDead();
-				}
-			}
-		
-		}
-
-		if (!worldObj.isRemote) { 
-			int filled = (int)Math.round(tanks.getPercentFull());
-			if (filled != lastFilled.getValue()) {
-				lastFilled.setValue(filled);
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			}
-		}
-
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return tanks.drain(from, maxDrain, doDrain);
 	}
+	
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		return tanks.drain(tankIndex, maxDrain, doDrain);
+	}
+	
+	@Override
+	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+		return 0;
+	}
+	
+	@Override
+	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
+		return 0;
+	}
+	
+	public int getInventoryRenderAmount() {
+		return this.inventoryRenderAmount;
+	}
+	
+	public int getLastFilled() {
+		return lastFilled.getValue();
+	}
+	
 	
 	public LiquidStack getLiquidStack() {
 		return tanks.getLiquid();
 	}
 	
-	public int getLastFilled() {
-		return lastFilled.getValue();
+	@Override
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks.getTank(direction, type);
+	}
+	
+	@Override
+	public ILiquidTank[] getTanks(ForgeDirection direction) {
+		return tanks.getTanks(direction);
 	}
 	
 	@Override
@@ -108,6 +104,73 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 		lastFilled.readFromNBT(tag);
 	}
 	
+
+	@Override
+	public void readFromNetwork(NBTTagCompound tag) {
+		lastFilled.readFromNBT(tag);
+	}
+
+	public void setInventoryRenderAmount(int inventoryRenderAmount) {
+		this.inventoryRenderAmount = inventoryRenderAmount;
+	}
+
+	public void setTankAmount(double percent) {
+		tanks.fill(LiquidDictionary.getLiquid("liquidxp", (int)(percent * tanks.getCapacity())), true);
+	}
+
+	@Override
+	public void updateEntity() {
+
+		createBounds();
+		
+		if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
+			return;
+		}
+		
+		List<EntityXPOrb> orbs = (List<EntityXPOrb>) worldObj.getEntitiesWithinAABB(EntityXPOrb.class, suckupBounds);
+		
+		for (EntityXPOrb entity : orbs) {
+			
+			if (!entity.isDead) {
+	
+				double x = (xCoord + 0.5D - entity.posX) / 15.0D;
+				double y = (yCoord + 0.5D - entity.posY) / 15.0D;
+				double z = (zCoord + 0.5D - entity.posZ) / 15.0D;
+				
+				double distance = Math.sqrt(x * x + y * y + z * z);
+				double var11 = 1.0D - distance;
+				
+				if (var11 > 0.0D) {
+					var11 *= var11;
+					entity.motionX += x / distance * var11 * 0.05;
+					entity.motionY += y / distance * var11 * 0.2;
+					entity.motionZ += z / distance * var11 * 0.05;
+				}
+				
+				if (!worldObj.isRemote) {
+					if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
+						tanks.fill(EnchantmentUtils.XPToLiquidRatio(entity.getXpValue()), true);
+						entity.setDead();
+					}
+				}
+			}
+		}
+
+		if (!worldObj.isRemote) { 
+			int filled = (int)Math.round(tanks.getPercentFull());
+			if (filled != lastFilled.getValue()) {
+				lastFilled.setValue(filled);
+				int metadata = (int)((double)filled / 10);
+				if (metadata != worldObj.getBlockMetadata(xCoord, yCoord, zCoord)) {
+					worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, metadata, 3);	
+				}else {
+					worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				}
+			}
+		}
+
+	}
+
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
@@ -116,33 +179,8 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 	}
 
 	@Override
-	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return 0;
-	}
-
-	@Override
-	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return 0;
-	}
-
-	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tanks.drain(from, maxDrain, doDrain);
-	}
-
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tanks.drain(tankIndex, maxDrain, doDrain);
-	}
-
-	@Override
-	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return tanks.getTanks(direction);
-	}
-
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks.getTank(direction, type);
+	public void writeToNetwork(NBTTagCompound tag) {
+		lastFilled.writeToNBT(tag);
 	}
 	
 }

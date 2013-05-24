@@ -1,13 +1,12 @@
 package openxp.client.renderer;
 
-import org.lwjgl.opengl.GL11;
-
-import openxp.client.model.ModelAnvil;
-import openxp.common.tileentity.TileEntityAutoAnvil;
-import openxp.common.util.BlockSide;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
+import openxp.client.model.ModelAnvil;
+import openxp.common.tileentity.TileEntityAutoAnvil;
+
+import org.lwjgl.opengl.GL11;
 
 public class RendererAutoAnvil extends TileEntitySpecialRenderer {
 

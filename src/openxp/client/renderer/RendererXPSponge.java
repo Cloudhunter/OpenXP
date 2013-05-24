@@ -17,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.liquids.LiquidStack;
 import openxp.OpenXP;
 import openxp.client.model.ModelXPSponge;
 import openxp.common.tileentity.TileEntityXPSponge;
@@ -27,17 +26,6 @@ import org.lwjgl.opengl.GL12;
 
 public class RendererXPSponge extends TileEntitySpecialRenderer {
 
-	protected ModelXPSponge model = new ModelXPSponge();
-	RenderItem renderItem;
-	protected ItemStack emptyBottleStack;
-	protected ItemStack xpBottleStack;
-
-	protected Random rnd = new Random();
-
-	protected orb[] orbs;
-
-	RenderBlocks renderBlocks = new RenderBlocks();
-
 	public class orb {
 		public double x = rnd.nextDouble() * 0.6;
 		public double y = 0;
@@ -46,87 +34,23 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 		public int color = 0;
 
 	}
+	protected ModelXPSponge model = new ModelXPSponge();
+	RenderItem renderItem;
+	protected ItemStack emptyBottleStack;
+
+	protected ItemStack xpBottleStack;
+
+	protected Random rnd = new Random();
+
+	protected orb[] orbs;
+
+	RenderBlocks renderBlocks = new RenderBlocks();
 
 	public RendererXPSponge() {
 		orbs = new orb[10];
 		for (int i = 0; i < orbs.length; i++) {
 			orbs[i] = new orb();
 		}
-	}
-
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double x, double y,
-			double z, float partialTick) {
-
-		TileEntityXPSponge sponge = (TileEntityXPSponge) tileentity;
-
-		double lastFilled = (double)sponge.getLastFilled() / 100.0;
-
-		double top = 0.05 + (lastFilled * 0.9);
-
-		if (lastFilled > 0.1) {
-			for (int i = 0; i < orbs.length; i++) {
-				orbs[i].y = top - 0.05;
-				renderOrbs(x, y, z, orbs[i]);
-			}
-		}
-
-		GL11.glPushMatrix();
-
-		GL11.glTranslatef((float) x + 0.5F, (float) y, (float) z + 0.5F);
-
-		GL11.glPushMatrix();
-
-		LiquidStack stack = sponge.getLiquidStack();
-		if (stack != null) {
-
-			GL11.glDisable(2896);
-			Tessellator t = Tessellator.instance;
-			renderBlocks.setRenderBounds(0.05D, 0.05D, 0.05D, 0.95D, top, 0.95D);
-			t.startDrawingQuads();
-
-			t.setColorOpaque_F(1.0F, 1.0F, 1.0F);
-			t.setBrightness(200);
-			Icon renderingIcon = OpenXP.liquidStack.getRenderingIcon();
-
-			bindTextureByName("/mods/openxp/textures/items/xpjuice.png");
-
-			Block XPSponge = OpenXP.Blocks.XPSponge;
-			renderBlocks.renderFaceXNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-			renderBlocks.renderFaceXPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-			renderBlocks.renderFaceYNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-			renderBlocks.renderFaceYPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-			renderBlocks.renderFaceZNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-			renderBlocks.renderFaceZPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
-
-			t.draw();
-
-			GL11.glEnable(2896);
-		}
-
-
-		bindTextureByName("/mods/openxp/textures/blocks/xpsponge.png");
-		model.render();
-
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		bindTextureByName("/mods/openxp/textures/blocks/xpsponge.png");
-		model.renderSponge();
-		GL11.glDisable(GL11.GL_BLEND);
-
-		GL11.glPopMatrix();
-
-		GL11.glScalef(0.02f, 0.02f, 0.02f);
-		GL11.glRotatef(180.0F, 0, 0, 1);
-
-		renderItem = ((RenderItem) RenderManager.instance
-				.getEntityClassRenderObject(EntityItem.class));
-		RenderEngine re = Minecraft.getMinecraft().renderEngine;
-		FontRenderer fr = getFontRenderer();
-
-
-		GL11.glPopMatrix();
-
 	}
 
 	private void renderOrbs(double x, double y, double z, orb o) {
@@ -178,6 +102,86 @@ public class RendererXPSponge extends TileEntitySpecialRenderer {
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	public void renderTileEntityAt(TileEntity tileentity, double x, double y,
+			double z, float partialTick) {
+
+		TileEntityXPSponge sponge = (TileEntityXPSponge) tileentity;
+		int inventoryRenderAmount = sponge.getInventoryRenderAmount();
+		
+		double lastFilled = 0;
+		
+		lastFilled = (double)sponge.getLastFilled() / 100.0;
+
+		if (inventoryRenderAmount > 0) {
+			lastFilled = (double)inventoryRenderAmount / 10;
+		}
+		
+		double top = 0.05 + (lastFilled * 0.9);
+
+		if (lastFilled > 0.1) {
+			for (int i = 0; i < orbs.length; i++) {
+				orbs[i].y = top - 0.05;
+				renderOrbs(x, y, z, orbs[i]);
+			}
+		}
+
+		GL11.glPushMatrix();
+
+		GL11.glTranslatef((float) x + 0.5F, (float) y, (float) z + 0.5F);
+
+		GL11.glPushMatrix();
+				
+		if (lastFilled > 0.0) {
+			GL11.glDisable(2896);
+			Tessellator t = Tessellator.instance;
+			renderBlocks.setRenderBounds(0.05D, 0.05D, 0.05D, 0.95D, top, 0.95D);
+			t.startDrawingQuads();
+	
+			t.setColorOpaque_F(1.0F, 1.0F, 1.0F);
+			t.setBrightness(200);
+			Icon renderingIcon = OpenXP.liquidStack.getRenderingIcon();
+	
+			bindTextureByName("/mods/openxp/textures/items/xpjuice.png");
+	
+			Block XPSponge = OpenXP.Blocks.XPSponge;
+			renderBlocks.renderFaceXNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+			renderBlocks.renderFaceXPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+			renderBlocks.renderFaceYNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+			renderBlocks.renderFaceYPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+			renderBlocks.renderFaceZNeg(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+			renderBlocks.renderFaceZPos(XPSponge, -0.5D, 0.0D, -0.5D, renderingIcon);
+	
+			t.draw();
+		}
+
+		GL11.glEnable(2896);
+
+
+		bindTextureByName("/mods/openxp/textures/blocks/xpsponge.png");
+		model.render();
+
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		bindTextureByName("/mods/openxp/textures/blocks/xpsponge.png");
+		model.renderSponge();
+		GL11.glDisable(GL11.GL_BLEND);
+
+		GL11.glPopMatrix();
+
+		GL11.glScalef(0.02f, 0.02f, 0.02f);
+		GL11.glRotatef(180.0F, 0, 0, 1);
+
+		renderItem = ((RenderItem) RenderManager.instance
+				.getEntityClassRenderObject(EntityItem.class));
+		RenderEngine re = Minecraft.getMinecraft().renderEngine;
+		FontRenderer fr = getFontRenderer();
+
+
+		GL11.glPopMatrix();
+
 	}
 
 }

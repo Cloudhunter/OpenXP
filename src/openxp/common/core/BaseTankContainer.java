@@ -7,15 +7,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
+import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 
 public class BaseTankContainer implements ITankContainer {
 
-	private LiquidTank[] tanks;
+	private XPTank[] tanks;
 	protected List<ITankCallback> callbacks;
 	
-	public BaseTankContainer(LiquidTank ... tanks) {
+	public BaseTankContainer(XPTank ... tanks) {
 		this.tanks = tanks;
 		this.callbacks = new ArrayList<ITankCallback>();
 	}
@@ -24,47 +24,26 @@ public class BaseTankContainer implements ITankContainer {
 		callbacks.add(callback);
 	}
 	
-	public void onTankChanged(int index) {
-        for (int i = 0; i < callbacks.size(); ++i) {
-            callbacks.get(i).onTankChanged(this, index);
-        }
-	}
-	
-	public LiquidStack getLiquid() {
-		return getLiquid(0);
-	}
-	
-	public LiquidStack getLiquid(int index) {
-		return tanks[index].getLiquid();
-	}
-	
-	public int getTankAmount(int index) {
-		LiquidStack liquid = getLiquid(index);
-		if (liquid != null) {
-			return liquid.amount;
+	@Override
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		LiquidStack drained = tanks[0].drain(maxDrain, doDrain);
+		if (doDrain && drained.amount > 0) {
+			onTankChanged(0);
 		}
-		return 0;
-	}
-
-	public int getTankAmount() {
-		return getTankAmount(0);
+		return drained;
 	}
 	
-	
-	public int getCapacity() {
-		return getCapacity(0);
+	public LiquidStack drain(int maxDrain, boolean doDrain) {
+		return drain(0, maxDrain, doDrain);
 	}
 	
-	public int getCapacity(int i) {
-		return tanks[i].getCapacity();
-	}
-	
-	public double getPercentFull() {
-		return getPercentFull(0);
-	}
-	
-	public double getPercentFull(int i) {
-		return 100.0 / getCapacity(i) * getTankAmount(i);
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		LiquidStack drained = tanks[tankIndex].drain(maxDrain, doDrain);
+		if (drained != null && doDrain && drained.amount > 0) {
+			onTankChanged(tankIndex);
+		}
+		return drained;
 	}
 	
 	@Override
@@ -76,10 +55,6 @@ public class BaseTankContainer implements ITankContainer {
 		return fillAmount;
 	}
 
-	public int fill(LiquidStack resource, boolean doFill) {
-		return fill(0, resource, doFill);
-	}
-	
 	@Override
 	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
 		int fillAmount = tanks[tankIndex].fill(resource, doFill);
@@ -89,26 +64,58 @@ public class BaseTankContainer implements ITankContainer {
 		return fillAmount;
 	}
 	
-	public LiquidStack drain(int maxDrain, boolean doDrain) {
-		return drain(0, maxDrain, doDrain);
+	
+	public int fill(LiquidStack resource, boolean doFill) {
+		return fill(0, resource, doFill);
+	}
+	
+	public int fill(int amount, boolean doFill) {
+		return fill(LiquidDictionary.getLiquid("liquidxp", amount), doFill);
+	}
+	
+	public int getCapacity() {
+		return getCapacity(0);
+	}
+	
+	public int getCapacity(int i) {
+		return tanks[i].getCapacity();
+	}
+	
+	public int getFreeSpace() {
+		return getCapacity() - getTankAmount();
+	}
+	
+	public LiquidStack getLiquid() {
+		return getLiquid(0);
+	}
+	
+	public LiquidStack getLiquid(int index) {
+		return tanks[index].getLiquid();
 	}
 
+	public double getPercentFull() {
+		return getPercentFull(0);
+	}
+	
+	public double getPercentFull(int i) {
+		return 100.0 / getCapacity(i) * getTankAmount(i);
+	}
+	
 	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		LiquidStack drained = tanks[0].drain(maxDrain, doDrain);
-		if (doDrain && drained.amount > 0) {
-			onTankChanged(0);
-		}
-		return drained;
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks[0];
 	}
 
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		LiquidStack drained = tanks[tankIndex].drain(maxDrain, doDrain);
-		if (doDrain && drained.amount > 0) {
-			onTankChanged(tankIndex);
+	public int getTankAmount() {
+		return getTankAmount(0);
+	}
+
+	public int getTankAmount(int index) {
+		LiquidStack liquid = getLiquid(index);
+		if (liquid != null) {
+			return liquid.amount;
 		}
-		return drained;
+		return 0;
 	}
 
 	@Override
@@ -116,9 +123,10 @@ public class BaseTankContainer implements ITankContainer {
 		return tanks;
 	}
 
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks[0];
+	public void onTankChanged(int index) {
+        for (int i = 0; i < callbacks.size(); ++i) {
+            callbacks.get(i).onTankChanged(this, index);
+        }
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {

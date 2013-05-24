@@ -41,47 +41,6 @@ public class ContainerGeneric extends Container {
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer pl, int i) {
-		ItemStack itemstack = null;
-		Slot slot = (Slot) inventorySlots.get(i);
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
-			if (i < inventorySize) {
-				if (!mergeItemStack(itemstack1, inventorySize, inventorySlots.size(), true))
-					return null;
-			} else if (!mergeItemStack(itemstack1, 0, inventorySize, false))
-				return null;
-			if (itemstack1.stackSize == 0) {
-				slot.putStack(null);
-			} else {
-				slot.onSlotChanged();
-			}
-		}
-		return itemstack;
-	}
-
-	@Override
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return true;
-	}
-
-	public TileEntity getTileEntity() {
-		return this.tileentity;
-	}
-
-	public int getInventorySize() {
-		return inventorySize;
-	}
-
-	public boolean enchantItem(EntityPlayer player, int button) {
-		if (tileentity instanceof IHasSimpleGui) {
-			((IHasSimpleGui)tileentity).onServerButtonClicked(player, button);
-		}
-		return false;
-	}
-	
-	@Override
     public void addCraftingToCrafters(ICrafting crafting)
     {
         super.addCraftingToCrafters(crafting);
@@ -93,16 +52,21 @@ public class ContainerGeneric extends Container {
 	        }
         }
     }
-	
-    public void detectAndSendChanges()
+
+	@Override
+	public boolean canInteractWith(EntityPlayer entityplayer) {
+		return true;
+	}
+
+	public void detectAndSendChanges()
     {
         super.detectAndSendChanges();
-
+        
+        
         if (tileentity instanceof IHasSimpleGui) {
         	
 	        int[] newValues = ((IHasSimpleGui)tileentity).getGuiValues();
 	        
-
 	        for (int i = 0; i < this.crafters.size(); ++i)
 	        {
 	            ICrafting icrafting = (ICrafting)this.crafters.get(i);
@@ -122,6 +86,42 @@ public class ContainerGeneric extends Container {
 	        }
         }
     }
+
+	public boolean enchantItem(EntityPlayer player, int button) {
+		if (tileentity instanceof IHasSimpleGui) {
+			((IHasSimpleGui)tileentity).onServerButtonClicked(player, button);
+		}
+		return false;
+	}
+
+	public int getInventorySize() {
+		return inventorySize;
+	}
+	
+	public TileEntity getTileEntity() {
+		return this.tileentity;
+	}
+	
+    @Override
+	public ItemStack transferStackInSlot(EntityPlayer pl, int i) {
+		ItemStack itemstack = null;
+		Slot slot = (Slot) inventorySlots.get(i);
+		if (slot != null && slot.getHasStack()) {
+			ItemStack itemstack1 = slot.getStack();
+			itemstack = itemstack1.copy();
+			if (i < inventorySize) {
+				if (!mergeItemStack(itemstack1, inventorySize, inventorySlots.size(), true))
+					return null;
+			} else if (!mergeItemStack(itemstack1, 0, inventorySize, false))
+				return null;
+			if (itemstack1.stackSize == 0) {
+				slot.putStack(null);
+			} else {
+				slot.onSlotChanged();
+			}
+		}
+		return itemstack;
+	}
     
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int par1, int par2)

@@ -19,6 +19,30 @@ public class TickHandler implements ITickHandler {
 		new HashMap<Integer, LinkedBlockingQueue<FutureTask>>()
 	);
 
+	public static Future addTickCallback(World world, Callable callback) throws InterruptedException {
+	    int worldId = world.provider.dimensionId;
+		if (!callbacks.containsKey(Integer.valueOf(worldId))) {
+	    	callbacks.put(worldId, new LinkedBlockingQueue());
+	    }
+	    FutureTask task = new FutureTask(callback);
+	    callbacks.get(worldId).put(task);
+	    return task;
+	}
+
+	@Override
+	public String getLabel() {
+		return "OpenXP";
+	}
+
+	@Override
+	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+	}
+
+	@Override
+	public EnumSet<TickType> ticks() {
+		return EnumSet.of(TickType.WORLD);
+	}
+
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickObjects) {
 		if (type.contains(TickType.WORLD)) {
@@ -33,30 +57,6 @@ public class TickHandler implements ITickHandler {
 				}
 			}
 		}
-	}
-
-	public static Future addTickCallback(World world, Callable callback) throws InterruptedException {
-	    int worldId = world.provider.dimensionId;
-		if (!callbacks.containsKey(Integer.valueOf(worldId))) {
-	    	callbacks.put(worldId, new LinkedBlockingQueue());
-	    }
-	    FutureTask task = new FutureTask(callback);
-	    callbacks.get(worldId).put(task);
-	    return task;
-	}
-
-	@Override
-	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-	}
-
-	@Override
-	public EnumSet<TickType> ticks() {
-		return EnumSet.of(TickType.WORLD);
-	}
-
-	@Override
-	public String getLabel() {
-		return "OpenXP";
 	}
 
 }

@@ -1,11 +1,13 @@
 package openxp.common.block;
 
 import net.minecraft.block.BlockEnchantmentTable;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import openxp.OpenXP;
 import openxp.common.tileentity.TileEntityAutomatedEnchantmentTable;
+import openxp.common.util.BlockUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
@@ -19,7 +21,18 @@ public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
 
 		GameRegistry.registerTileEntity(TileEntityAutomatedEnchantmentTable.class, "enchantmentTable");
 
-		setUnlocalizedName("openxp.enchantmentTable");
+		setUnlocalizedName("openxp.enchantmenttable");
+	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, par5, par6);
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(World world) {
+		return new TileEntityAutomatedEnchantmentTable();
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z,
@@ -32,10 +45,4 @@ public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
 		player.openGui(OpenXP.instance, OpenXP.Gui.enchantmentTable.ordinal(), world, x, y, z);
 		return true;
 	}
-
-	@Override
-	public TileEntity createNewTileEntity(World world) {
-		return new TileEntityAutomatedEnchantmentTable();
-	}
-
 }

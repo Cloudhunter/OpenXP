@@ -56,10 +56,6 @@ public class ModelXPSponge extends ModelBase {
 
 	}
 
-	public void renderSponge() {
-		sponge.render(f5);
-	}
-
 	public void render() {
 		for (int i = 0; i < shortSides.length; i++) {
 			shortSides[i].render(f5);
@@ -67,6 +63,10 @@ public class ModelXPSponge extends ModelBase {
 		for (int i = 0; i < longSides.length; i++) {
 			longSides[i].render(f5);
 		}
+	}
+
+	public void renderSponge() {
+		sponge.render(f5);
 	}
 
 

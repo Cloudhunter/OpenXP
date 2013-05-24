@@ -9,17 +9,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
 import openxp.common.core.BaseInventory;
 import openxp.common.core.BaseTankContainer;
@@ -27,7 +22,9 @@ import openxp.common.core.BaseTileEntity;
 import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
-import openxp.common.core.SavableInt;
+import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
+import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 /**
  * The TileEntity object for the Automatic Anvil
@@ -44,32 +41,29 @@ ITankCallback  {
 	public final static int MODIFIER_STACK = 1;
 	public final static int OUTPUT_STACK = 2;
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(EnchantmentUtils.getExperienceForLevel(39)));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+			new XPTank(EnchantmentUtils.getLiquidForLevel(39))
+	);
+	
 	protected BaseInventory inventory = new BaseInventory("autoAnvil", true, 3);
 	protected boolean hasChanged = false;
 
 	/**
 	 * The progress bar in the GUI
 	 */
-	protected SavableInt progress = new SavableInt("progress");
-	private SavableInt percentStored = new SavableInt("percentStored");
-	private SavableInt percentRequired = new SavableInt("percentRequired");
+	protected SyncableInt progress = new SyncableInt("progress");
+	private SyncableInt percentStored = new SyncableInt("percentStored");
+	private SyncableInt percentRequired = new SyncableInt("percentRequired");
 	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, percentRequired, progress);
-	private int xpRequired = 0;
+	
+	private int liquidRequired = 0;
+	private int stackSizeToBeUsedInRepair;
 	
 	public TileEntityAutoAnvil() {
 		inventory.addCallback(this);
 		tanks.addCallback(this);
 	}
-	
-	private int stackSizeToBeUsedInRepair;
 
-	public int getRotation() {
-		if (worldObj == null) {
-			return 0;
-		}
-		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-	}
 	
 	@Override
 	public void updateEntity() {
@@ -77,38 +71,27 @@ ITankCallback  {
 		super.updateEntity();
 
 		if (!worldObj.isRemote){
-
 			if (hasChanged) {
-				
-				xpRequired = updateRepairOutput(false);
-				if (xpRequired == 0) {
-					progress.setValue(0);
-				}
-				
-			} else {
-				if (xpRequired > 0 && tanks.getTankAmount() >= xpRequired) {
-					progress.add(1);
-					if (progress.getValue() >= getSpeed()) {
-						xpRequired = updateRepairOutput(true);
-						progress.setValue(0);
-					}
-				}else {
+				liquidRequired = updateRepairOutput(false);	
+			}
+			if (liquidRequired == 0) {
+				progress.setValue(0);
+			}
+			if (liquidRequired > 0 && tanks.getTankAmount() >= liquidRequired) {
+				progress.add(1);
+				if (progress.getValue() >= getSpeed()) {
+					liquidRequired = updateRepairOutput(true);
 					progress.setValue(0);
 				}
 			}
 
 			percentStored.setValue((int) tanks.getPercentFull());
-			percentRequired.setValue((int)(100.0 / tanks.getCapacity() * xpRequired));
+			percentRequired.setValue((int)(100.0 / tanks.getCapacity() * liquidRequired));
 			
 			hasChanged = false;
 		}
-
 	}
-
-	public int getSpeed() {
-		return 20;
-	}
-
+	
 	public int updateRepairOutput(boolean doIt)
     {
         ItemStack inputStack = inventory.getStackInSlot(INPUT_STACK);
@@ -344,43 +327,24 @@ ITankCallback  {
                 EnchantmentHelper.setEnchantments(inputStackEnchantments, inputStackCopy);
                 
                 int requiredXP = EnchantmentUtils.getExperienceForLevel(maximumCost);
-                if (tanks.getTankAmount() >= requiredXP && doIt) {
-                	tanks.drain(requiredXP, true);
+                int requiredLiquid = EnchantmentUtils.XPToLiquidRatio(requiredXP);
+                if (tanks.getTankAmount() >= requiredLiquid && doIt) {
+                	tanks.drain(requiredLiquid, true);
 		            inventory.setInventorySlotContents(INPUT_STACK, null);
 		            if (flag) {
 		            	stackSizeToBeUsedInRepair = 1;
 		            }
-		            inventory.decrStackSize(MODIFIER_STACK, stackSizeToBeUsedInRepair);
+		            inventory.decrStackSize(MODIFIER_STACK, Math.max(1, stackSizeToBeUsedInRepair));
 		            inventory.setInventorySlotContents(OUTPUT_STACK, inputStackCopy);
 		            progress.setValue(0);
 		            return 0;
                 }
-                return requiredXP;
+                return requiredLiquid;
             }
         }
         return 0;
         
     }
-
-	public int getPercentRequired() {
-		return percentRequired.getValue();
-	}
-	
-	public int getPercentStored() {
-		return percentStored.getValue();
-	}
-
-	public int getProgress() {
-		return progress.getValue();
-	}
-
-	public double getPercentProgress() {
-		return 100.0 / getSpeed() * getProgress();
-	}
-	
-	public int getExperience() {
-		return tanks.getTankAmount();
-	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
@@ -391,7 +355,7 @@ ITankCallback  {
 		percentRequired.readFromNBT(tag);
 		progress.readFromNBT(tag);
 	}
-
+	
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
@@ -401,104 +365,75 @@ ITankCallback  {
 		percentRequired.writeToNBT(tag);
 		progress.writeToNBT(tag);
 	}
-
-	@Override
-	public Packet getDescriptionPacket() {
-		Packet132TileEntityData packet = new Packet132TileEntityData();
-		packet.actionType = 0;
-		packet.xPosition = xCoord;
-		packet.yPosition = yCoord;
-		packet.zPosition = zCoord;
-		NBTTagCompound nbt = new NBTTagCompound();
-		writeToNBT(nbt);
-		packet.customParam1 = nbt;
-		return packet;
+	
+	public double getPercentProgress() {
+		return 100.0 / getSpeed() * getProgress();
 	}
 
-	@Override
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) {
-		readFromNBT(pkt.customParam1);
+	public int getPercentRequired() {
+		return percentRequired.getValue();
 	}
 
-	@Override
-	public void onInventoryChanged(BaseInventory inventory) {
-		hasChanged = true;
+	public int getPercentStored() {
+		return percentStored.getValue();
 	}
 
-	@Override
-	public void onTankChanged(BaseTankContainer tankContainer, int index) {
-		hasChanged = true;
+	public int getProgress() {
+		return progress.getValue();
 	}
 
-	@Override
-	public void onServerButtonClicked(EntityPlayer player, int button) {
-		onClientButtonClicked(button);
+	public int getRotation() {
+		if (worldObj == null) {
+			return 0;
+		}
+		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
 	}
 
-	@Override
-	public void onClientButtonClicked(int button) {
-
+	public int getSpeed() {
+		return 20;
 	}
 
+	/* IInventory implementation */
+	
 	@Override
-	public int[] getGuiValues() {
-		return guiValues.asIntArray();
+	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
+		return true;
 	}
-
-	@Override
-	public int getGuiValue(int index) {
-		return guiValues.get(index).getValue();
-	}
-
-	@Override
-	public void setGuiValue(int i, int value) {
-		guiValues.get(i).setValue(value);
-	}
-
-	@Override
-	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-		return tanks.fill(from, resource, doFill);
-	}
-
-	@Override
-	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-		return tanks.fill(tankIndex, resource, doFill);
-	}
-
-	@Override
-	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		return tanks.drain(from, maxDrain, doDrain);
-	}
-
-	@Override
-	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-		return tanks.drain(tankIndex, maxDrain, doDrain);
-	}
-
-	@Override
-	public ILiquidTank[] getTanks(ForgeDirection direction) {
-		return tanks.getTanks(direction);
-	}
-
-	@Override
-	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-		return tanks.getTank(direction, type);
-	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[0];
-	}
-
+	
 	@Override
 	public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
 		return isStackValidForSlot(slotID, itemstack);
 	}
 
 	@Override
-	public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
-		return true;
+	public void closeChest() {
+		inventory.closeChest();
 	}
+
+	@Override
+	public ItemStack decrStackSize(int stackIndex, int byAmount) {
+		return inventory.decrStackSize(stackIndex, byAmount);
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		if (side == BlockSide.TOP) {
+			return new int[] { INPUT_STACK };
+		}else if (side == BlockSide.BOTTOM) {
+			return new int[] { OUTPUT_STACK };
+		}
+		return new int[] { MODIFIER_STACK };
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return inventory.getInventoryStackLimit();
+	}
+
+	@Override
+	public String getInvName() {
+		return inventory.getInvName();
+	}	
 
 	@Override
 	public int getSizeInventory() {
@@ -511,23 +446,8 @@ ITankCallback  {
 	}
 
 	@Override
-	public ItemStack decrStackSize(int stackIndex, int byAmount) {
-		return inventory.decrStackSize(stackIndex, byAmount);
-	}
-
-	@Override
 	public ItemStack getStackInSlotOnClosing(int i) {
 		return inventory.getStackInSlotOnClosing(i);
-	}
-
-	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		inventory.setInventorySlotContents(i, itemstack);
-	}
-
-	@Override
-	public String getInvName() {
-		return inventory.getInvName();
 	}
 
 	@Override
@@ -536,8 +456,8 @@ ITankCallback  {
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
-		return inventory.getInventoryStackLimit();
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		return inventory.isStackValidForSlot(i, itemstack);
 	}
 
 	@Override
@@ -546,17 +466,86 @@ ITankCallback  {
 	}
 
 	@Override
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		inventory.setInventorySlotContents(i, itemstack);
+	}
+	
+	@Override
 	public void openChest() {
 		inventory.openChest();
 	}
+	
+	/* ITankContainer implementation */
 
 	@Override
-	public void closeChest() {
-		inventory.closeChest();
+	public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
+		return tanks.getTank(direction, type);
 	}
 
 	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
-		return inventory.isStackValidForSlot(i, itemstack);
+	public ILiquidTank[] getTanks(ForgeDirection direction) {
+		return tanks.getTanks(direction);
+	}
+	
+	@Override
+	public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return tanks.drain(from, maxDrain, doDrain);
+	}
+	
+	@Override
+	public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
+		return tanks.drain(tankIndex, maxDrain, doDrain);
+	}
+
+	@Override
+	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+		return tanks.fill(from, resource, doFill);
+	}
+
+	@Override
+	public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
+		return tanks.fill(tankIndex, resource, doFill);
+	}
+
+	/* ITankCallback implementation */
+	
+	@Override
+	public void onTankChanged(BaseTankContainer tankContainer, int index) {
+		hasChanged = true;
+	}
+
+
+	/* IHasSimpleGui Implementation */
+
+	@Override
+	public void onClientButtonClicked(int button) {
+
+	}
+	
+	@Override
+	public void setGuiValue(int i, int value) {
+		guiValues.get(i).setValue(value);
+	}
+
+	@Override
+	public void onServerButtonClicked(EntityPlayer player, int button) {
+		onClientButtonClicked(button);
+	}
+
+	@Override
+	public int getGuiValue(int index) {
+		return guiValues.get(index).getValue();
+	}
+
+	@Override
+	public int[] getGuiValues() {
+		return guiValues.asIntArray();
+	}
+	
+	/* IInventoryCallback implementation */
+	
+	@Override
+	public void onInventoryChanged(BaseInventory inventory) {
+		hasChanged = true;
 	}
 }
