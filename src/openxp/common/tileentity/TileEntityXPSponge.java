@@ -11,19 +11,17 @@ import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.common.core.BaseTankContainer;
 import openxp.common.core.BaseTileEntity;
 import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
 import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer {
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(
-							EnchantmentUtils.XPToLiquidRatio(
-									EnchantmentUtils.getExperienceForLevel(30)
-							)
-	));
+	protected BaseTankContainer tanks = new BaseTankContainer(
+			new XPTank(EnchantmentUtils.getLiquidForLevel(30))
+	);
 	
 	private SyncableInt lastFilled = new SyncableInt("lastFilled");
 	
@@ -125,33 +123,37 @@ public class TileEntityXPSponge extends BaseTileEntity implements ITankContainer
 
 		createBounds();
 		
+		if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
+			return;
+		}
+		
 		List<EntityXPOrb> orbs = (List<EntityXPOrb>) worldObj.getEntitiesWithinAABB(EntityXPOrb.class, suckupBounds);
 		
 		for (EntityXPOrb entity : orbs) {
-
-			double x = (xCoord + 0.5D - entity.posX) / 15.0D;
-			double y = (yCoord + 0.5D - entity.posY) / 15.0D;
-			double z = (zCoord + 0.5D - entity.posZ) / 15.0D;
 			
-			double distance = Math.sqrt(x * x + y * y + z * z);
-			double var11 = 1.0D - distance;
-			
-			if (var11 > 0.0D) {
-				var11 *= var11;
-				entity.motionX += x / distance * var11 * 0.05;
-				entity.motionY += y / distance * var11 * 0.2;
-				entity.motionZ += z / distance * var11 * 0.05;
-			}
-			
-			if (!worldObj.isRemote) {
-				if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
-					tanks.fill(LiquidDictionary.getLiquid("liquidxp",
-							EnchantmentUtils.XPToLiquidRatio(entity.getXpValue())
-					), true);
-					entity.setDead();
+			if (!entity.isDead) {
+	
+				double x = (xCoord + 0.5D - entity.posX) / 15.0D;
+				double y = (yCoord + 0.5D - entity.posY) / 15.0D;
+				double z = (zCoord + 0.5D - entity.posZ) / 15.0D;
+				
+				double distance = Math.sqrt(x * x + y * y + z * z);
+				double var11 = 1.0D - distance;
+				
+				if (var11 > 0.0D) {
+					var11 *= var11;
+					entity.motionX += x / distance * var11 * 0.05;
+					entity.motionY += y / distance * var11 * 0.2;
+					entity.motionZ += z / distance * var11 * 0.05;
+				}
+				
+				if (!worldObj.isRemote) {
+					if (destroyBounds.isVecInside(Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ))) {
+						tanks.fill(EnchantmentUtils.XPToLiquidRatio(entity.getXpValue()), true);
+						entity.setDead();
+					}
 				}
 			}
-		
 		}
 
 		if (!worldObj.isRemote) { 

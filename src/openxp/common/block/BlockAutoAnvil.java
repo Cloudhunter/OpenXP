@@ -2,6 +2,7 @@ package openxp.common.block;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -30,7 +31,11 @@ public class BlockAutoAnvil extends BlockContainer {
 		GameRegistry.registerTileEntity(TileEntityAutoAnvil.class, "autoAnvil");
 		setUnlocalizedName("openxp.autoanvil");
 	}
-	
+    
+	public void registerIcons(IconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon("openxp:anvilblock");
+    }
+    
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
@@ -65,7 +70,7 @@ public class BlockAutoAnvil extends BlockContainer {
 	@Override
 	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving, ItemStack itemStack) {
 		super.onBlockPlacedBy(world, i, j, k, entityliving, itemStack);
-		ForgeDirection orientation = BlockUtils.get2dOrientation(entityliving.getPosition(1.0F), Vec3.createVectorHelper(i, j, k));
+		ForgeDirection orientation = BlockUtils.get2dOrientation(Vec3.createVectorHelper(entityliving.posX, entityliving.posY, entityliving.posZ), Vec3.createVectorHelper(i, j, k));
 		world.setBlockMetadataWithNotify(i, j, k, orientation.getOpposite().ordinal(), 3);
 	}
 

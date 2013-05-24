@@ -7,15 +7,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
+import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 
 public class BaseTankContainer implements ITankContainer {
 
-	private LiquidTank[] tanks;
+	private XPTank[] tanks;
 	protected List<ITankCallback> callbacks;
 	
-	public BaseTankContainer(LiquidTank ... tanks) {
+	public BaseTankContainer(XPTank ... tanks) {
 		this.tanks = tanks;
 		this.callbacks = new ArrayList<ITankCallback>();
 	}
@@ -67,6 +67,10 @@ public class BaseTankContainer implements ITankContainer {
 	
 	public int fill(LiquidStack resource, boolean doFill) {
 		return fill(0, resource, doFill);
+	}
+	
+	public int fill(int amount, boolean doFill) {
+		return fill(LiquidDictionary.getLiquid("liquidxp", amount), doFill);
 	}
 	
 	public int getCapacity() {

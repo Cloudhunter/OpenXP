@@ -15,7 +15,6 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
 import openxp.common.core.BaseInventory;
 import openxp.common.core.BaseTankContainer;
@@ -24,6 +23,7 @@ import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
 import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
 import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 /**
@@ -42,12 +42,9 @@ ITankCallback  {
 	public final static int OUTPUT_STACK = 2;
 
 	protected BaseTankContainer tanks = new BaseTankContainer(
-			new LiquidTank(
-					EnchantmentUtils.XPToLiquidRatio(
-							EnchantmentUtils.getExperienceForLevel(39)
-					)
-			)
+			new XPTank(EnchantmentUtils.getLiquidForLevel(39))
 	);
+	
 	protected BaseInventory inventory = new BaseInventory("autoAnvil", true, 3);
 	protected boolean hasChanged = false;
 
@@ -58,6 +55,7 @@ ITankCallback  {
 	private SyncableInt percentStored = new SyncableInt("percentStored");
 	private SyncableInt percentRequired = new SyncableInt("percentRequired");
 	protected GuiValueHolder guiValues = new GuiValueHolder(percentStored, percentRequired, progress);
+	
 	private int liquidRequired = 0;
 	private int stackSizeToBeUsedInRepair;
 	
@@ -336,7 +334,7 @@ ITankCallback  {
 		            if (flag) {
 		            	stackSizeToBeUsedInRepair = 1;
 		            }
-		            inventory.decrStackSize(MODIFIER_STACK, stackSizeToBeUsedInRepair);
+		            inventory.decrStackSize(MODIFIER_STACK, Math.max(1, stackSizeToBeUsedInRepair));
 		            inventory.setInventorySlotContents(OUTPUT_STACK, inputStackCopy);
 		            progress.setValue(0);
 		            return 0;
@@ -422,9 +420,9 @@ ITankCallback  {
 		if (side == BlockSide.TOP) {
 			return new int[] { INPUT_STACK };
 		}else if (side == BlockSide.BOTTOM) {
-			return new int[] { MODIFIER_STACK };
+			return new int[] { OUTPUT_STACK };
 		}
-		return new int[] { OUTPUT_STACK };
+		return new int[] { MODIFIER_STACK };
 	}
 
 	@Override

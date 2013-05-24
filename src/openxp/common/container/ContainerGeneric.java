@@ -61,12 +61,12 @@ public class ContainerGeneric extends Container {
 	public void detectAndSendChanges()
     {
         super.detectAndSendChanges();
-
+        
+        
         if (tileentity instanceof IHasSimpleGui) {
         	
 	        int[] newValues = ((IHasSimpleGui)tileentity).getGuiValues();
 	        
-
 	        for (int i = 0; i < this.crafters.size(); ++i)
 	        {
 	            ICrafting icrafting = (ICrafting)this.crafters.get(i);

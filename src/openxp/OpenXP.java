@@ -13,6 +13,7 @@ import openxp.common.block.BlockLifeStone;
 import openxp.common.block.BlockXPBottler;
 import openxp.common.block.BlockXPSponge;
 import openxp.common.item.ItemLiquidXP;
+import openxp.common.turtle.TurtleOpenXP;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
@@ -21,7 +22,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
-@Mod( modid = "OpenXP", name = "OpenXP", version = "0.0.1")
+@Mod( modid = "OpenXP", name = "OpenXP", version = "0.0.6")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 public class OpenXP
 {
@@ -58,6 +59,8 @@ public class OpenXP
 	{
 		public static ItemLiquidXP liquidXP;
 	}
+	
+	public static TurtleOpenXP xpTurtle;
 	
 	public static String RESOURCE_PATH;
 	

@@ -11,11 +11,11 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.OpenXP;
 import openxp.common.ccintegration.BaseTurtlePeripheral;
 import openxp.common.ccintegration.LuaMethod;
 import openxp.common.core.BaseTankContainer;
+import openxp.common.core.XPTank;
 import openxp.common.util.EnchantmentUtils;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.IHostedPeripheral;
@@ -24,11 +24,8 @@ import dan200.turtle.api.TurtleSide;
 
 public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHostedPeripheral {
 
-	protected BaseTankContainer tanks = new BaseTankContainer(new LiquidTank(
-			EnchantmentUtils.XPToLiquidRatio(
-						EnchantmentUtils.getExperienceForLevel(50)
-					)
-			)
+	protected BaseTankContainer tanks = new BaseTankContainer(
+		new XPTank(EnchantmentUtils.getLiquidForLevel(50))
 	);
 
 	public PeripheralOpenXPTurtle(ITurtleAccess turtle, TurtleSide side) {
@@ -59,10 +56,11 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 				);
 		List<EntityXPOrb> orbs = (List<EntityXPOrb>) turtle.getWorld().getEntitiesWithinAABB(EntityXPOrb.class, suckupBounds);
 		for (EntityXPOrb orb : orbs) {
-			xpCollected += orb.getXpValue();
-			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.XPToLiquidRatio(orb.getXpValue())
-					), true);
-			orb.setDead();
+			if (!orb.isDead) {
+				xpCollected += orb.getXpValue();
+				tanks.fill(EnchantmentUtils.XPToLiquidRatio(orb.getXpValue()), true);
+				orb.setDead();
+			}
 		}
 		return xpCollected;
 	}
@@ -169,11 +167,6 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 		return EnchantmentUtils.LiquidToXPRatio(tanks.getTankAmount());
 	}
 
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		tanks.readFromNBT(tag);
-	}
-
 	@LuaMethod(onTick = true)
 	public int suck(IComputerAccess computer, Double amount) {
 		return suckFromTank(0, amount, ForgeDirection.UNKNOWN);
@@ -235,4 +228,10 @@ public class PeripheralOpenXPTurtle extends BaseTurtlePeripheral implements IHos
 	public void writeToNBT(NBTTagCompound tag) {
 		tanks.writeToNBT(tag);
 	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		tanks.readFromNBT(tag);
+	}
+
 }

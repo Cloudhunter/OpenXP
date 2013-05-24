@@ -9,9 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
-import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
 import openxp.common.ccintegration.LuaMethod;
 import openxp.common.core.BaseInventory;
@@ -21,6 +19,8 @@ import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
 import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
+import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 
 public class TileEntityXPBottler extends BaseTileEntity implements IInventory,
@@ -53,11 +53,7 @@ ITankCallback {
 	 * A wrapper around the tank
 	 */
 	protected BaseTankContainer tanks = new BaseTankContainer(
-				new LiquidTank(
-						EnchantmentUtils.XPToLiquidRatio(
-								EnchantmentUtils.XP_PER_BOTTLE * 32
-						)
-				)
+				new XPTank(EnchantmentUtils.LIQUID_PER_XP_BOTTLE * 32)
 	);
 	
 	/**
@@ -152,12 +148,12 @@ ITankCallback {
 		// if the progress is complete, lets fill the tank, fix the slots and reset the progress
 		if (progress.getValue() >= getSpeed()) {
 			switchSlots(Item.glassBottle);
-			tanks.fill(LiquidDictionary.getLiquid("liquidxp", EnchantmentUtils.LIQUID_PER_XP_BOTTLE), true);
+			tanks.fill(EnchantmentUtils.LIQUID_PER_XP_BOTTLE, true);
 			progress.setValue(0);
 		}
 
 	}
-
+	
 	@Override
 	public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
 		return tanks.fill(from, resource, doFill);
@@ -204,7 +200,10 @@ ITankCallback {
 	
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[0];
+		if (side == BlockSide.TOP){
+			return new int[] { INPUT_SLOT };
+		}
+		return new int[] { OUTPUT_SLOT };
 	}
 
 	@Override

@@ -128,4 +128,8 @@ public class EnchantmentUtils {
 	public static int XPToLiquidRatio(int xp) {
 		return xp * RATIO;
 	}
+	
+	public static int getLiquidForLevel(int level) {
+		return XPToLiquidRatio(getExperienceForLevel(level));
+	}
 }

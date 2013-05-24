@@ -10,13 +10,13 @@ public class ModelLifeStone extends ModelBase {
 	float f5 = 0.0625F;
 
 	public ModelLifeStone() {
-		textureWidth = 32;
-		textureHeight = 32;
+		textureWidth = 16;
+		textureHeight = 16;
 
 		main = new ModelRenderer(this, 0, 0);
 		main.addBox(-2F, 0F, -2F, 4, 7, 4);
 		main.setRotationPoint(0F, 9F, 0F);
-		main.setTextureSize(32, 32);
+		main.setTextureSize(16, 16);
 		main.mirror = true;
 		setRotation(main, 0F, 0F, 0F);
 	}

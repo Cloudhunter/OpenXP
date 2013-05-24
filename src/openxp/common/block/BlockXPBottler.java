@@ -39,7 +39,7 @@ public class BlockXPBottler extends BlockContainer {
 		PeripheralRegistry.registerTileEntity(TileEntityXPBottler.class, "xpbottler");
 		setUnlocalizedName("openxp.xpbottler");
 	}
-
+	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));
@@ -83,7 +83,7 @@ public class BlockXPBottler extends BlockContainer {
 	@Override
 	public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving, ItemStack itemStack) {
 		super.onBlockPlacedBy(world, i, j, k, entityliving, itemStack);
-		ForgeDirection orientation = BlockUtils.get2dOrientation(entityliving.getPosition(1.0F), Vec3.createVectorHelper(i, j, k));
+		ForgeDirection orientation = BlockUtils.get2dOrientation(Vec3.createVectorHelper(entityliving.posX,  entityliving.posY,  entityliving.posZ), Vec3.createVectorHelper(i, j, k));
 		world.setBlockMetadataWithNotify(i, j, k, orientation.getOpposite().ordinal(), 3);
 	}
 

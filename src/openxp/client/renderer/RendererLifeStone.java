@@ -1,13 +1,11 @@
 package openxp.client.renderer;
 
-import org.lwjgl.opengl.GL11;
-
-import openxp.client.model.ModelAnvil;
-import openxp.client.model.ModelLifeStone;
-import openxp.common.tileentity.TileEntityAutoAnvil;
-import openxp.common.tileentity.TileEntityLifeStone;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+import openxp.client.model.ModelLifeStone;
+import openxp.common.tileentity.TileEntityLifeStone;
+
+import org.lwjgl.opengl.GL11;
 
 public class RendererLifeStone extends TileEntitySpecialRenderer {
 

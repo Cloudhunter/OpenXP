@@ -2,6 +2,7 @@ package openxp.common.block;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -19,8 +20,13 @@ public class BlockLifeStone extends BlockContainer {
 		GameRegistry.registerBlock(this, "healingstone");
 		GameRegistry.registerTileEntity(TileEntityLifeStone.class, "healingstone");
 		this.setBlockBounds(0.35f, 0f, 0.35f, 0.65f, 0.5f, 0.65f);
-		setUnlocalizedName("openxp.healingstone");
+		setUnlocalizedName("openxp.lifestone");
 	}
+	
+
+	public void registerIcons(IconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon("openxp:lifestone");
+    }
     
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)

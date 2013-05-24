@@ -1,9 +1,8 @@
 package openxp.client.gui;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
@@ -21,6 +20,7 @@ public class SimpleGui extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int mouseX, int mouseY) {
+		
 		for (int i = 0; i < buttons.length; i++) {
 			buttons[i].updateState(mouseX, mouseY, width, height, xSize, ySize);
 		}

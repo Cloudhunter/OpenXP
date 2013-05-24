@@ -13,7 +13,6 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
 import openxp.api.IHasSimpleGui;
 import openxp.common.core.BaseInventory;
 import openxp.common.core.BaseTankContainer;
@@ -21,6 +20,7 @@ import openxp.common.core.GuiValueHolder;
 import openxp.common.core.IInventoryCallback;
 import openxp.common.core.ITankCallback;
 import openxp.common.core.SyncableInt;
+import openxp.common.core.XPTank;
 import openxp.common.util.BlockSide;
 import openxp.common.util.EnchantmentUtils;
 
@@ -42,11 +42,7 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 	protected SyncableInt mode = new SyncableInt("mode");
 	protected SyncableInt levelsAvailable = new SyncableInt("levelsAvailable");
 	protected BaseTankContainer tanks = new BaseTankContainer(
-			new LiquidTank(
-					EnchantmentUtils.XPToLiquidRatio(
-							EnchantmentUtils.getExperienceForLevel(30)
-					)
-			)
+			new XPTank(EnchantmentUtils.getLiquidForLevel(30))
 	);
 	protected BaseInventory inventory = new BaseInventory("enchantmenttable", true, 2);
 	protected boolean hasChanged = false;
@@ -100,10 +96,10 @@ ITankContainer, ISidedInventory, ITankCallback, IInventoryCallback {
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		if (side == BlockSide.BOTTOM) {
-			return new int[] { OUTPUT_STACK };
+		if (side == BlockSide.TOP){
+			return new int[] { INPUT_STACK };
 		}
-		return new int[] { INPUT_STACK };
+		return new int[] { OUTPUT_STACK };
 	}
 
 	@Override

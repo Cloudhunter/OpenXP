@@ -1,6 +1,7 @@
 package openxp.common.block;
 
 import net.minecraft.block.BlockEnchantmentTable;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -22,7 +23,7 @@ public class BlockAutomatedEnchantmentTable extends BlockEnchantmentTable {
 
 		setUnlocalizedName("openxp.enchantmenttable");
 	}
-
+	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		BlockUtils.dropInventoryItems(world.getBlockTileEntity(x, y, z));

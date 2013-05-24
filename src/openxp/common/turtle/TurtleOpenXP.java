@@ -1,10 +1,14 @@
 package openxp.common.turtle;
 
+import java.util.List;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import openxp.OpenXP;
 import openxp.common.turtle.peripheral.PeripheralOpenXPTurtle;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.turtle.api.ITurtleAccess;
@@ -60,5 +64,24 @@ public class TurtleOpenXP implements ITurtleUpgrade {
 	public boolean useTool(ITurtleAccess turtle, TurtleSide side,
 			TurtleVerb verb, int direction) {
 		return false;
+	}
+	
+	public void addTurtlesToCreative(List subItems) {
+		for (int i = 0; i <= 7; i++) {
+			ItemStack turtle = GameRegistry.findItemStack("CCTurtle", "CC-TurtleExpanded", 1);
+			if (turtle != null)
+			{
+				NBTTagCompound tag = turtle.getTagCompound();
+				if (tag == null)
+				{
+					tag = new NBTTagCompound();
+					turtle.writeToNBT(tag);
+				}
+				tag.setShort("leftUpgrade", (short) getUpgradeID());
+				tag.setShort("rightUpgrade", (short) i);
+				turtle.setTagCompound(tag);
+				subItems.add(turtle);
+			}
+		}
 	}
 }

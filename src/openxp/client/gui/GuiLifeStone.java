@@ -1,11 +1,10 @@
 package openxp.client.gui;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import openxp.api.IHasSimpleGui;
 import openxp.common.container.ContainerGeneric;
 import openxp.common.tileentity.TileEntityLifeStone;
+
+import org.lwjgl.opengl.GL11;
 
 public class GuiLifeStone extends SimpleGui {
 
@@ -21,10 +20,10 @@ public class GuiLifeStone extends SimpleGui {
 		this.lifeStone = (TileEntityLifeStone) tileentity;
 
 		buttons = new SimpleGuiButton[] {
-				new SimpleGuiButton(10, 48, 7, 4, null, 0, 39, 67),
-				new SimpleGuiButton(10, 53, 7, 4, null, 1, 46, 67),
-				new SimpleGuiButton(9, 21, 10, 10, null, 2, 29, 67),
-				new SimpleGuiButton(9, 35, 10, 10, null, 3, 29, 67)
+				new SimpleGuiButton(10, 48, 7, 4, null, TileEntityLifeStone.Button.INCREASE_RANGE.ordinal(), 39, 67),
+				new SimpleGuiButton(10, 53, 7, 4, null, TileEntityLifeStone.Button.DECREASE_RANGE.ordinal(), 46, 67),
+				new SimpleGuiButton(9, 21, 10, 10, null, TileEntityLifeStone.Button.HEAL_PLAYERS.ordinal(), 29, 67),
+				new SimpleGuiButton(9, 35, 10, 10, null, TileEntityLifeStone.Button.DAMAGE_MOBS.ordinal(), 29, 67)
 		};
 	}
 	
